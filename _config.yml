@@ -1,0 +1,9 @@
+title: Meta Data Engineer Prep Blueprint
+description: Interactive Technical & Case Study Guide
+theme: jekyll-theme-primer
+include:
+  - app.py
+  - requirements.txt
+  - assets
+exclude:
+  - .github

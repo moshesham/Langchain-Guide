@@ -1,0 +1,8 @@
+{
+  "name": "Lachlan Guide",
+  "description": "Interactive Technical \u0026 Case Study Guide for AI Engineers to learn and explore the different approaches and aspects of using langchIn and similar systems to build and manage ai systems at scale ",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
