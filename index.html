@@ -7,13 +7,20 @@
   <meta name="description" content="Interactive Technical & Architectural Guide for AI Engineers to master LangChain, RAG Pipelines, Vector Databases, and Scalable Agentic Systems in Production" />
   <meta property="og:title" content="LangChain & AI Systems Engineering Mastery" />
   <meta property="og:description" content="Interactive Technical & Architectural Guide for AI Engineers to master LangChain, RAG Pipelines, Vector Databases, and Scalable Agentic Systems in Production" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Resource Hints & DNS Prefetch to speed up CDN handshakes -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Preload application code in parallel with HTML parsing -->
+  <link rel="preload" href="app.py" as="fetch" crossorigin />
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.0/build/stlite.css" />
   <link rel="stylesheet" href="assets/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 </head>
 <body>
   <div id="root">
@@ -28,11 +35,11 @@
       <div style="width: 280px; height: 4px; background: #1E293B; border-radius: 9999px; overflow: hidden; margin-bottom: 14px;">
         <div style="width: 45%; height: 100%; background: linear-gradient(90deg, #2563EB, #8B5CF6); border-radius: 9999px; animation: loadingPulse 1.8s infinite ease-in-out;"></div>
       </div>
-      <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94A3B8; font-weight: 600;">
+      <div id="loading-status-text" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94A3B8; font-weight: 600;">
         Mounting Pyodide & AI Engineering Runtime...
       </div>
-      <div style="font-size: 11px; color: #64748B; margin-top: 6px; font-family: 'JetBrains Mono', monospace;">
-        Initializing LangChain simulation engine, Plotly, Pandas & Vector Models
+      <div id="loading-substatus-text" style="font-size: 11px; color: #64748B; margin-top: 6px; font-family: 'JetBrains Mono', monospace;">
+        Initializing WebAssembly sandbox, Plotly, Pandas & Vector Models
       </div>
     </div>
   </div>
@@ -43,14 +50,27 @@
       100% { transform: translateX(250%); }
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.0/build/stlite.js"></script>
+
+  <!-- Pre-initiate fetch for app.py immediately in parallel -->
   <script>
-    fetch("app.py")
+    window.appCodePromise = fetch("app.py", { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load app.py: " + res.status);
         return res.text();
-      })
+      });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.0/build/stlite.js"></script>
+  <script>
+    const statusText = document.getElementById("loading-status-text");
+    const substatusText = document.getElementById("loading-substatus-text");
+
+    if (statusText) statusText.innerText = "Loading Pyodide & Compiling Python Wasm...";
+    if (substatusText) substatusText.innerText = "Downloading and unpacking wheels into browser memory...";
+
+    window.appCodePromise
       .then((appCode) => {
+        if (statusText) statusText.innerText = "Mounting Streamlit Applet...";
         stlite.mount(
           {
             requirements: ["plotly", "pandas", "numpy"],
@@ -82,8 +102,8 @@
         }
       });
   </script>
-  <!-- Marked.js for fast markdown rendering -->
-  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <!-- Marked.js loaded with defer so it never blocks DOM rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js" defer></script>
 
   <!-- Grounded Search Sidebar Toggle Button -->
   <button id="search-sidebar-toggle" onclick="toggleSearchSidebar()" title="Open AI Systems Research Radar">
