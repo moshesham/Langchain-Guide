@@ -6,171 +6,138 @@ import plotly.graph_objects as go
 import json
 import time
 
-# Page config
+# ---------------------------------------------------------
+# PAGE CONFIGURATION
+# ---------------------------------------------------------
 st.set_page_config(
-    page_title="Meta DE Prep Blueprint",
+    page_title="LangChain & AI Systems Engineering Mastery",
     layout="wide",
-    page_icon="⚡"
+    page_icon="🦜"
 )
 
-# Meta Color Palette & Constants
-META_BLUE = "#0666FE"
-META_BLUE_HOVER = "#0550c9"
-META_TEAL = "#00B4D8"
-META_PURPLE = "#8B5CF6"
-BG_DARK = "#0F172A"
-BG_CARD = "#1E293B"
+# AI Engineering Dark Theme Colors & Constants
+AI_BLUE = "#3B82F6"
+AI_BLUE_HOVER = "#2563EB"
+AI_PURPLE = "#8B5CF6"
+AI_CYAN = "#06B6D4"
+AI_EMERALD = "#10B981"
+AI_AMBER = "#F59E0B"
+AI_ROSE = "#F43F5E"
+BG_DARK = "#0B0F19"
+BG_CARD = "#161F30"
+BORDER_DARK = "#2D3A4F"
 TEXT_LIGHT = "#F8FAFC"
 TEXT_MUTED = "#94A3B8"
-BORDER_DARK = "#334155"
 
-# Safe pandas styler helper for cross-version compatibility
-def style_dataframe_safe(df, highlight_col, condition_fn, color="#047857"):
-    try:
-        def cell_styler(val):
-            return f"background-color: {color}; color: #FFFFFF;" if condition_fn(val) else ""
-        
-        if hasattr(df.style, "map"):
-            return df.style.map(cell_styler, subset=[highlight_col])
-        elif hasattr(df.style, "applymap"):
-            return df.style.applymap(cell_styler, subset=[highlight_col])
-    except Exception:
-        pass
-    return df
-
-# Initialize session state for persistent tracking
-if "checklist_state" not in st.session_state:
-    st.session_state.checklist_state = {
-        "SQL Window Functions (Dense_Rank, Row_Number)": True,
-        "Python Interval Merging & Stream Deque": True,
-        "Star Schema vs Snowflake Trade-offs": True,
-        "SCD Type 2 Dimension Implementation": False,
-        "Presto / Spark Shuffle & Salting for Data Skew": False,
-        "Broadcast vs Hash Joins & Partition Pruning": False,
-        "Idempotent Backfill & Circuit Breakers": False,
-        "Product Sense: Root Cause Analysis (RCA) Framework": True,
-        "Feature Store & Training-Serving Skew Monitoring": False,
-        "Cohort Retention Triangles & Funnel Conversions": False,
-        "Write 5 Meta Core Values STAR Stories": False,
-        "Complete 2 Full 45-min Timed Mock Screens": False,
+# ---------------------------------------------------------
+# SESSION STATE INITIALIZATION
+# ---------------------------------------------------------
+if "ai_readiness_checklist" not in st.session_state:
+    st.session_state.ai_readiness_checklist = {
+        "LCEL Runnable Protocol (invoke, batch, stream, astream)": True,
+        "Hybrid RAG (Dense Embeddings + BM25 Sparse + RRF)": True,
+        "Cross-Encoder Reranking & Context Compression": True,
+        "Vector DB Index Sizing (HNSW M/efConstruction & PQ)": False,
+        "Semantic Caching with Vector Distance Thresholds": False,
+        "LangGraph StateGraph & Cyclic Multi-Agent Loops": True,
+        "Tool Calling with Strict Pydantic Schema Guardrails": False,
+        "Prompt Caching Prefix Optimization (Gemini / Anthropic)": False,
+        "Ragas Automated Evaluation (Faithfulness & Precision)": False,
+        "LangSmith Tracing, Feedback Collector & Latency Budgets": True,
+        "Multi-Tenant Vector DB Namespace Isolation": False,
+        "vLLM PagedAttention & Continuous Batching Deployment": False
     }
 
-if "star_stories" not in st.session_state:
-    st.session_state.star_stories = [
-        {
-            "value": "Focus on Long-Term Impact",
-            "title": "Migrated Petabyte-Scale User Engagement Pipeline to Incremental Merge",
-            "summary": "Reduced pipeline compute costs by 42% and SLA runtime from 6.5 hours to 45 minutes by implementing hourly incremental delta merges with partition swapping."
-        }
-    ]
+if "active_mermaid_step" not in st.session_state:
+    st.session_state.active_mermaid_step = "Step 4: Vector Retrieval"
 
 # ---------------------------------------------------------
-# DASHBOARD / OVERVIEW
+# MODULE 0: OVERVIEW & ARCHITECTURE DASHBOARD
 # ---------------------------------------------------------
 def render_dashboard():
-    st.title("🏠 Meta Data Engineer Prep Blueprint")
-    st.caption("Interactive Technical, Data Modeling, Distributed Architecture & Case Study Guide")
+    st.title("🦜 LangChain & Production AI Systems Blueprint")
+    st.caption("Interactive Technical Guide for AI Engineers building Enterprise RAG, Vector DBs & Agentic Workflows at Scale")
     
     # Header KPI stats
-    total_tasks = len(st.session_state.checklist_state)
-    done_tasks = sum(1 for v in st.session_state.checklist_state.values() if v)
-    readiness_pct = int((done_tasks / total_tasks) * 100) if total_tasks else 0
+    total_checks = len(st.session_state.ai_readiness_checklist)
+    done_checks = sum(1 for v in st.session_state.ai_readiness_checklist.values() if v)
+    readiness_pct = int((done_checks / total_checks) * 100) if total_checks else 0
     
-    kpi_col1, kpi_col2, kpi_col3, kpi_col4 = st.columns(4)
-    with kpi_col1:
+    k1, k2, k3, k4 = st.columns(4)
+    with k1:
         st.markdown(f"""
         <div class="card">
-            <div class="label">Interview Funnel Pass Rate</div>
-            <div style="font-size: 22px; font-weight: 700; color: {META_BLUE}; margin: 4px 0;">2.4%</div>
-            <div style="font-size: 11px; color: {TEXT_MUTED};">Top 2% bar for L4/L5 DE offers</div>
+            <div class="label">RAG Pipeline Latency Target</div>
+            <div style="font-size: 22px; font-weight: 700; color: {AI_BLUE}; margin: 4px 0;">&lt; 650 ms</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">P95 end-to-end TTFT including hybrid reranking</div>
         </div>
         """, unsafe_allow_html=True)
-    with kpi_col2:
+    with k2:
         st.markdown(f"""
         <div class="card">
-            <div class="label">Checklist Readiness</div>
-            <div style="font-size: 22px; font-weight: 700; color: #10B981; margin: 4px 0;">{readiness_pct}%</div>
-            <div style="font-size: 11px; color: {TEXT_MUTED};">{done_tasks}/{total_tasks} core competencies validated</div>
+            <div class="label">Architectural Readiness</div>
+            <div style="font-size: 22px; font-weight: 700; color: {AI_EMERALD}; margin: 4px 0;">{readiness_pct}%</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">{done_checks}/{total_checks} core competencies validated</div>
         </div>
         """, unsafe_allow_html=True)
-    with kpi_col3:
+    with k3:
         st.markdown(f"""
         <div class="card">
-            <div class="label">Onsite Evaluation Rounds</div>
-            <div style="font-size: 22px; font-weight: 700; color: #F59E0B; margin: 4px 0;">5 Rounds</div>
-            <div style="font-size: 11px; color: {TEXT_MUTED};">2x Tech Screen, 2x System/Modeling, 1x Behavioral</div>
+            <div class="label">Semantic Cache Savings</div>
+            <div style="font-size: 22px; font-weight: 700; color: {AI_PURPLE}; margin: 4px 0;">Up to 68%</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">Token cost & latency reduction at high QPS</div>
         </div>
         """, unsafe_allow_html=True)
-    with kpi_col4:
+    with k4:
         st.markdown(f"""
         <div class="card">
-            <div class="label">Core Architecture Stack</div>
-            <div style="font-size: 22px; font-weight: 700; color: #A855F7; margin: 4px 0;">Presto / Spark</div>
-            <div style="font-size: 11px; color: {TEXT_MUTED};">Trino, Flink, RocksDB, Iceberg/Hive</div>
+            <div class="label">Primary Stack</div>
+            <div style="font-size: 22px; font-weight: 700; color: {AI_CYAN}; margin: 4px 0;">LangChain / LCEL</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">LangGraph, Vector DBs, Ragas, Flash Models</div>
         </div>
         """, unsafe_allow_html=True)
 
-    col_funnel, col_radar = st.columns([5, 7])
+    c_left, c_right = st.columns([6, 6])
     
-    with col_funnel:
-        st.markdown("### Interview Funnel Lifecycle")
-        stages = [
-            "Recruiter Screen (100%)",
-            "Technical Screen: SQL + Python (40%)",
-            "Data Modeling Case (18%)",
-            "System Architecture & Big Data Case (8%)",
-            "Behavioral & Culture Fit (4%)",
-            "Final Offer Extends (2.4%)"
+    with c_left:
+        st.markdown("### 🏛️ Production AI Architecture Stack")
+        layers = [
+            ("Client Applications & APIs", "Web Client, Chatbot UI, REST/gRPC API, Async Event Consumers", AI_BLUE),
+            ("Orchestration & State (LangChain / LangGraph)", "LCEL RunnableSequence, Multi-Agent StateGraph, Checkpoints", AI_PURPLE),
+            ("Retrieval & Context Compression", "HyDE Query Expansion, Dense + BM25 Hybrid, Cross-Encoder Rerank", AI_CYAN),
+            ("Vector Storage & Knowledge Stores", "Pinecone, Qdrant, Chroma, FAISS, pgvector with HNSW Indices", AI_EMERALD),
+            ("LLM Serving & Token Infrastructure", "Gemini 2.5 Flash, Claude 3.5, GPT-4o, vLLM PagedAttention", AI_AMBER),
+            ("Observability & Evaluation (LLMOps)", "LangSmith Traces, Ragas Metrics (Faithfulness, Recall), Guardrails", AI_ROSE)
         ]
-        rates = [100, 40, 18, 8, 4, 2.4]
-        colors = [META_BLUE, "#38BDF8", "#818CF8", "#A78BFA", "#C084FC", "#10B981"]
         
-        fig_funnel = go.Figure(go.Funnel(
-            y=stages,
-            x=rates,
-            textinfo="value+percent initial",
-            marker=dict(color=colors)
-        ))
-        fig_funnel.update_layout(
-            margin=dict(l=10, r=10, t=10, b=10),
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color=TEXT_LIGHT, size=11),
-            height=300
-        )
-        st.plotly_chart(fig_funnel, use_container_width=True)
+        for name, desc, color in layers:
+            st.markdown(f"""
+            <div style="background: {BG_CARD}; border-left: 4px solid {color}; border-top: 1px solid {BORDER_DARK}; border-right: 1px solid {BORDER_DARK}; border-bottom: 1px solid {BORDER_DARK}; border-radius: 6px; padding: 10px 14px; margin-bottom: 8px;">
+                <div style="font-weight: 700; font-size: 12.5px; color: {color};">{name}</div>
+                <div style="font-size: 11px; color: {TEXT_MUTED}; margin-top: 2px;">{desc}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-    with col_radar:
-        st.markdown("### Competency Domains Assessment")
-        categories = ['SQL Engine Optimization', 'Python Algorithms', 'Dimensional Modeling', 'Distributed Pipelines', 'Product Sense / RCA', 'System Design']
-        
-        with st.expander("⚙️ Adjust Competency Skill Ratings", expanded=False):
-            c_cols = st.columns(3)
-            user_ratings = []
-            for idx, cat in enumerate(categories):
-                with c_cols[idx % 3]:
-                    val = st.slider(cat, 1, 5, 4 if idx < 3 else 3, key=f"radar_{idx}")
-                    user_ratings.append(val)
-        
-        if 'user_ratings' not in locals():
-            user_ratings = [4, 4, 4, 3, 3, 3]
-
-        meta_target = [5, 4.5, 4.5, 4, 4.5, 4]
+    with c_right:
+        st.markdown("### 🧭 AI Systems Competency Radar")
+        categories = ['LCEL / Runnables', 'RAG Retrieval', 'Vector Stores', 'Agentic Graphs', 'Cost Engineering', 'LLM Evaluation']
+        current_ratings = [4, 4, 3, 4, 3, 4]
+        target_ratings = [5, 5, 4.5, 4.5, 4.5, 4.5]
         
         fig_radar = go.Figure()
         fig_radar.add_trace(go.Scatterpolar(
-            r=user_ratings + [user_ratings[0]],
+            r=current_ratings + [current_ratings[0]],
             theta=categories + [categories[0]],
             fill='toself',
-            name='Your Current Level',
-            line=dict(color=META_BLUE, width=2),
-            fillcolor='rgba(6, 102, 254, 0.25)'
+            name='Current Proficiency',
+            line=dict(color=AI_BLUE, width=2),
+            fillcolor='rgba(59, 130, 246, 0.25)'
         ))
         fig_radar.add_trace(go.Scatterpolar(
-            r=meta_target + [meta_target[0]],
+            r=target_ratings + [target_ratings[0]],
             theta=categories + [categories[0]],
-            name='Meta Target (L5 Senior DE)',
-            line=dict(color='#10B981', dash='dash', width=2)
+            name='Production Target (Staff AI Architect)',
+            line=dict(color=AI_EMERALD, dash='dash', width=2)
         ))
         fig_radar.update_layout(
             polar=dict(
@@ -186,1093 +153,1453 @@ def render_dashboard():
         st.plotly_chart(fig_radar, use_container_width=True)
 
     st.markdown("---")
-    st.markdown("### 🎯 Quick Module Access")
-    m_col1, m_col2, m_col3 = st.columns(3)
-    with m_col1:
+    st.markdown("### 🚀 Interactive Blueprint Modules")
+    m1, m2, m3 = st.columns(3)
+    with m1:
         st.markdown("""
-        **Core Data Architecture**
-        - [Module 2] Star Schema & SCD Type 2
-        - [Module 3] Presto/Trino SQL & Windowing
-        - [Module 5] Atomic Partition Swaps & DAGs
+        **RAG & Retrieval Architecture**
+        - **Module 1:** Interactive Mermaid RAG Sequence Diagram
+        - **Module 3:** Vector DB Scaling Configurator (Pinecone, FAISS, Chroma, Qdrant)
+        - **Module 5:** Advanced Hybrid Retrieval & Reranking
         """)
-    with m_col2:
+    with m2:
         st.markdown("""
-        **Product & Algorithms**
-        - [Module 1] Metric Drop RCA Simulator
-        - [Module 4] Interval Merging & Stream Queues
-        - [Module 7] Funnels & Retention Triangles
+        **Cost & Core Frameworks**
+        - **Module 2:** Slider-based Scaling Cost & Token Calculator
+        - **Module 4:** LangChain LCEL & Runnable Protocol
+        - **Module 6:** LangGraph Agent State Machines
         """)
-    with m_col3:
+    with m3:
         st.markdown("""
-        **Infrastructure & Interview**
-        - [Module 6] AI Feature Stores & Drift
-        - [Module 8] Authentic Meta Core Values STAR
-        - [Module 9] 4-Week Action Roadmap
-        """)
-
-# ---------------------------------------------------------
-# MODULE 1: PRODUCT SENSE & METRICS STRATEGY
-# ---------------------------------------------------------
-def render_module_1():
-    st.title("📊 Module 1: Product Sense & RCA (Root Cause Analysis)")
-    st.caption("Master Meta's Framework for Diagnosing Complex Metric Drops & Building Metric Trees")
-    
-    st.markdown("""
-    <div class="card">
-        <div class="label">Meta RCA 6-Step Interview Framework</div>
-        <ol style="margin-top: 6px; padding-left: 20px; font-size: 12px; color: #E2E8F0; line-height: 1.6;">
-            <li><strong>Clarify the Metric:</strong> Exact definition, numerator/denominator, time horizon, and baseline seasonality.</li>
-            <li><strong>Verify Data Pipeline Integrity:</strong> Is it a true user behavior drop or a logging/ETL/telemetry outage?</li>
-            <li><strong>Segment Dimensions:</strong> Slice by OS, App Version, Geography, Network Type, User Tenure, and Traffic Source.</li>
-            <li><strong>Isolate Anomaly:</strong> Pinpoint the single dimension or intersection where the delta is concentrated.</li>
-            <li><strong>Form Hypotheses:</strong> App releases, feature rollouts, third-party API dependencies, cannibalization, or external holidays/blackouts.</li>
-            <li><strong>Action & Mitigation:</strong> Feature flag rollback, hotfix deployment, pipeline backfill, and executive communication.</li>
-        </ol>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("### Interactive RCA Metric Drop Simulator")
-    selected_scenario = st.selectbox(
-        "Select Active Outage Case Study:",
-        [
-            "Scenario A: Instagram Reels Watch Time Drop (-8.2%)",
-            "Scenario B: Facebook Active Video Creators Decline (-6.4%)"
-        ]
-    )
-    
-    col_filters1, col_filters2 = st.columns(2)
-    with col_filters1:
-        os_filter = st.multiselect("OS Filter", ["iOS", "Android", "Web"], default=["iOS", "Android", "Web"])
-        region_filter = st.multiselect("Region", ["NA", "EMEA", "APAC", "LATAM"], default=["NA", "EMEA", "APAC", "LATAM"])
-    with col_filters2:
-        tenure_filter = st.multiselect("User Cohort Tenure", ["New (<30d)", "Active Core", "Resurrected"], default=["New (<30d)", "Active Core", "Resurrected"])
-        version_filter = st.multiselect("App Version", ["v200 (Stable)", "v201 (Rollout)", "v202 (Latest Canary)"], default=["v200 (Stable)", "v201 (Rollout)", "v202 (Latest Canary)"])
-        
-    st.write("---")
-    
-    if "Scenario A" in selected_scenario:
-        # Condition: iOS + v202 + NA/EMEA
-        is_isolated = ("iOS" in os_filter and "v202 (Latest Canary)" in version_filter and len(os_filter) == 1 and len(version_filter) == 1)
-        contains_bug = ("iOS" in os_filter and "v202 (Latest Canary)" in version_filter)
-        
-        if is_isolated:
-            st.error("🚨 ROOT CAUSE CONFIRMED: -36.4% Watch Time crash strictly isolated to iOS v202 in NA & EMEA! A deadlock bug in the new AVPlayer hardware video decoder causes autoplay stalls on high-refresh ProMotion screens.")
-        elif contains_bug:
-            st.warning("⚠️ High variance detected: iOS v202 is exhibiting heavy drops, but your filters still include unaffected platforms. Narrow down to isolate.")
-        else:
-            st.success("✅ Metric looks stable across the selected sub-dimensions. Keep slicing across OS and Version releases.")
-            
-        dates = pd.date_range(end="2024-05-14", periods=14)
-        df_chart = pd.DataFrame({
-            "Date": dates,
-            "iOS v202 (Defective)": [100, 101, 99, 102, 100, 98, 64, 62, 63, 61, 60, 62, 59, 61],
-            "iOS v201 (Stable)": [100, 101, 100, 102, 101, 99, 100, 101, 99, 100, 101, 99, 100, 101],
-            "Android v202": [99, 100, 101, 100, 99, 100, 101, 100, 99, 100, 101, 100, 101, 100]
-        })
-        fig = px.line(df_chart, x="Date", y=["iOS v202 (Defective)", "iOS v201 (Stable)", "Android v202"], title="Watch Time Index by Platform & Version (Release Date: May 7)")
-        fig.add_vline(x="2024-05-07", line_width=2, line_dash="dash", line_color="#EF4444", annotation_text="v202 Canary Release")
-        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=TEXT_LIGHT))
-        st.plotly_chart(fig, use_container_width=True)
-
-    else:
-        # Scenario B: Android + APAC + v201
-        is_isolated = ("Android" in os_filter and "APAC" in region_filter and "v201 (Rollout)" in version_filter and len(os_filter) == 1 and len(region_filter) == 1)
-        contains_bug = ("Android" in os_filter and "APAC" in region_filter and "v201 (Rollout)" in version_filter)
-        
-        if is_isolated:
-            st.error("🚨 ROOT CAUSE CONFIRMED: -29.2% Active Video Creators in Android v201 across APAC! Audio picker API calls are timing out due to a regional copyright CDN certificate failure during the upload flow.")
-        elif contains_bug:
-            st.warning("⚠️ Anomaly signals detected in Android APAC traffic. Refine your filters to pinpoint the exact version and cohort.")
-        else:
-            st.success("✅ Metric looks stable across the selected dimensions. Investigate geographic network logs or specific platform versions.")
-            
-        regions = ["NA", "EMEA", "APAC", "LATAM"]
-        df_region = pd.DataFrame({
-            "Region": regions,
-            "Creator Change %": [+1.2, -0.4, -29.2, +0.8]
-        })
-        fig = px.bar(df_region, x="Region", y="Creator Change %", color="Creator Change %", color_continuous_scale=["#EF4444", "#10B981"], title="Creator Delta by Region (Android)")
-        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=TEXT_LIGHT))
-        st.plotly_chart(fig, use_container_width=True)
-
-    st.markdown("### Metric Hierarchy & Guardrail Trade-offs")
-    col_l1, col_l2, col_l3 = st.columns(3)
-    with col_l1:
-        st.markdown("""
-        <div class="card">
-            <div class="label" style="color: #60A5FA;">L1: North Star Metric</div>
-            <div style="font-weight: 700; font-size: 14px; margin: 6px 0;">Daily Active Engaged Users (DAU)</div>
-            <p style="font-size: 11px; color: #94A3B8;">Represents core platform health and network value realization.</p>
-        </div>
-        """, unsafe_allow_html=True)
-    with col_l2:
-        st.markdown("""
-        <div class="card">
-            <div class="label" style="color: #34D399;">L2: Input Driver Metrics</div>
-            <div style="font-weight: 700; font-size: 14px; margin: 6px 0;">Video Watch Time, Creator Uploads, Session Length</div>
-            <p style="font-size: 11px; color: #94A3B8;">Direct levers that engineering and product teams can optimize.</p>
-        </div>
-        """, unsafe_allow_html=True)
-    with col_l3:
-        st.markdown("""
-        <div class="card">
-            <div class="label" style="color: #F87171;">Counter & Guardrail Metrics</div>
-            <div style="font-weight: 700; font-size: 14px; margin: 6px 0;">Ad Hide Rate, App Crash Rate, Push Unsubscribe %</div>
-            <p style="font-size: 11px; color: #94A3B8;">Ensures short-term engagement wins do not erode user trust or retention.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# MODULE 2: DATA MODELING & SCHEMA DESIGN
-# ---------------------------------------------------------
-def render_module_2():
-    st.title("📐 Module 2: Data Modeling & Schema Design")
-    st.caption("Meta Dimensional Modeling: Fact Grains, SCD Type 2 Timelines & Cumulative Bitmasks")
-    
-    st.markdown("### Interactive Star Schema Explorer")
-    selected_fact = st.selectbox(
-        "Select Core Fact Table Grain:",
-        ["fact_reel_impressions (Atomic Event Grain)", "fact_daily_creator_aggregates (Daily Rollup Grain)", "fact_ad_conversions (Transaction Grain)"]
-    )
-    
-    if "fact_reel_impressions" in selected_fact:
-        st.code("""
--- Fact Grain: 1 row per unique video playback event
-CREATE TABLE fact_reel_impressions (
-    impression_id       VARCHAR(64),      -- High cardinality event UUID
-    user_id             BIGINT,           -- FK -> dim_user [PK]
-    reel_id             BIGINT,           -- FK -> dim_reel [PK]
-    creator_id          BIGINT,           -- FK -> dim_creator [PK]
-    device_id           VARCHAR(64),      -- FK -> dim_device
-    watch_duration_ms   INT,              -- Additive metric: ms watched
-    video_length_ms     INT,              -- Additive metric: total duration
-    is_completed        BOOLEAN,          -- Degenerate dimension: 100% watched
-    is_liked            BOOLEAN,          -- Degenerate dimension: like event
-    is_shared           BOOLEAN,          -- Degenerate dimension: share event
-    ds                  VARCHAR(10)       -- Partition key: YYYY-MM-DD
-)
-PARTITIONED BY (ds)
-CLUSTERED BY (user_id) INTO 256 BUCKETS;
-        """, language="sql")
-    elif "fact_daily_creator_aggregates" in selected_fact:
-        st.code("""
--- Fact Grain: 1 row per creator per day
-CREATE TABLE fact_daily_creator_aggregates (
-    creator_id          BIGINT,           -- FK -> dim_creator [PK]
-    ds                  VARCHAR(10),      -- Partition key: YYYY-MM-DD
-    total_views         BIGINT,           -- Daily aggregate metric
-    total_watch_sec     DOUBLE,           -- Daily aggregate metric
-    net_new_followers   INT,              -- Daily delta
-    unique_viewers      BIGINT            -- HyperLogLog sketch or count
-)
-PARTITIONED BY (ds);
-        """, language="sql")
-    else:
-        st.code("""
--- Fact Grain: 1 row per ad click/conversion attributed event
-CREATE TABLE fact_ad_conversions (
-    conversion_id       VARCHAR(64),      -- UUID
-    campaign_id         BIGINT,           -- FK -> dim_ad_campaign
-    advertiser_id       BIGINT,           -- FK -> dim_advertiser
-    user_id             BIGINT,           -- FK -> dim_user
-    conversion_type     VARCHAR(32),      -- 'purchase', 'signup', 'lead'
-    conversion_value    DECIMAL(12,2),    -- Attributed revenue
-    attribution_window  VARCHAR(16),      -- '1d_click', '7d_view'
-    ds                  VARCHAR(10)       -- Partition key: YYYY-MM-DD
-)
-PARTITIONED BY (ds);
-        """, language="sql")
-
-    st.markdown("---")
-    st.markdown("### SCD Type 2 Timeline Simulator (Slowly Changing Dimensions)")
-    st.write("Track dimension changes across time while preserving historical accuracy for point-in-time joins.")
-    
-    col_scd_in1, col_scd_in2, col_scd_in3 = st.columns(3)
-    with col_scd_in1:
-        new_loc = st.selectbox("Simulate User Relocation:", ["US -> UK", "UK -> Germany (DE)", "DE -> Japan (JP)"])
-    with col_scd_in2:
-        effective_date = st.date_input("Effective Transition Date", value=pd.to_datetime("2024-04-01"))
-    with col_scd_in3:
-        st.write("")
-        st.write("")
-        simulate_update = st.button("Apply SCD Type 2 Update", type="primary")
-
-    df_scd = pd.DataFrame({
-        "surrogate_key": [1001, 1002, 1003],
-        "user_id": [884102, 884102, 884102],
-        "country": ["US", "UK", "DE"],
-        "tier": ["Standard", "Creator", "Creator VIP"],
-        "effective_start_ds": ["2022-01-01", "2023-06-15", str(effective_date)],
-        "effective_end_ds": ["2023-06-14", "2024-03-31", "9999-12-31"],
-        "is_current": [False, False, True]
-    })
-    
-    st.caption("Active Dimension Table (`dim_user_scd2`):")
-    st.dataframe(style_dataframe_safe(df_scd, "is_current", lambda x: x == True, "#047857"), use_container_width=True)
-
-    st.markdown("---")
-    st.markdown("### Meta Cumulative Retention Array & Bitmask Pattern")
-    st.markdown("""
-    At Meta scale (3+ billion users), performing 30-day self-joins on raw event tables is computationally prohibitive. 
-    Instead, Meta stores a single integer or 32-bit bitmask per user in a daily cumulated table.
-    """)
-    
-    col_bm1, col_bm2 = st.columns([6, 6])
-    with col_bm1:
-        st.markdown("**Interactive Bitmask Calculator:**")
-        days_active = st.multiselect(
-            "Select Days User Logged In (Last 7 Days):",
-            [f"Day {i}" for i in range(1, 8)],
-            default=["Day 1", "Day 2", "Day 3", "Day 7"]
-        )
-        
-        # Calculate bitmask
-        bitmask = 0
-        for d in days_active:
-            day_num = int(d.split()[1])
-            bitmask |= (1 << (day_num - 1))
-            
-        binary_repr = f"{bitmask:07b}"
-        l7_count = bin(bitmask & 0b1111111).count("1")
-        is_active_today = bool(bitmask & 1)
-        
-        st.markdown(f"""
-        - **Calculated Bitmask (Decimal):** `{bitmask}`
-        - **Binary Representation:** `{binary_repr}`
-        - **L7 Active Days:** `{l7_count} / 7 days`
-        - **Active Today (D0):** `{'YES (Retained)' if is_active_today else 'NO (Inactive Today)'}`
-        """)
-    
-    with col_bm2:
-        st.code("""
--- Cumulative Table Schema
-CREATE TABLE user_activity_cumulated (
-    user_id             BIGINT,
-    ds                  VARCHAR(10),     -- Today's partition
-    dates_active        ARRAY<VARCHAR>,  -- Chronological login dates
-    active_days_bitmask BIGINT           -- Bitwise representation
-)
-PARTITIONED BY (ds);
-
--- Bitwise Query for 7-Day Active Users (L7):
-SELECT COUNT(user_id) AS l7_dau
-FROM user_activity_cumulated
-WHERE ds = '2024-05-14'
-  AND (active_days_bitmask & 127) > 0; -- 127 is binary 1111111
-        """, language="sql")
-
-# ---------------------------------------------------------
-# MODULE 3: SQL ENGINE EXECUTION & OPTIMIZATION
-# ---------------------------------------------------------
-def render_module_3():
-    st.title("⚡ Module 3: SQL Engine Execution & Optimization")
-    st.caption("Deep-Dive on Presto/Trino, Window Functions, MapReduce Shuffle & Join Algorithms")
-    
-    st.markdown("### Interactive Meta SQL Interview Problem Bank")
-    selected_problem = st.selectbox(
-        "Choose an Interview Question:",
-        [
-            "1. User Sessionization with 30-Minute Inactivity Window",
-            "2. Top 3 Trending Reels per Country (DENSE_RANK)",
-            "3. 7-Day Rolling Active Watch Duration (ROWS BETWEEN)",
-            "4. Growth Accounting: User Lifecycle Transitions"
-        ]
-    )
-    
-    if "Sessionization" in selected_problem:
-        st.markdown("""
-        **Problem Statement:** Given a stream of user click events, group them into sessions. 
-        A new session starts when a user has been inactive for **more than 30 minutes**.
-        """)
-        
-        st.code("""
-WITH event_gaps AS (
-    SELECT 
-        user_id,
-        event_time,
-        LAG(event_time) OVER (
-            PARTITION BY user_id 
-            ORDER BY event_time
-        ) AS prev_event_time
-    FROM user_click_events
-),
-session_flags AS (
-    SELECT 
-        user_id,
-        event_time,
-        CASE 
-            WHEN prev_event_time IS NULL THEN 1
-            WHEN DATE_DIFF('minute', prev_event_time, event_time) > 30 THEN 1
-            ELSE 0 
-        END AS is_new_session
-    FROM event_gaps
-)
-SELECT 
-    user_id,
-    event_time,
-    -- Cumulative sum of flags generates sequential session IDs
-    SUM(is_new_session) OVER (
-        PARTITION BY user_id 
-        ORDER BY event_time 
-        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-    ) AS session_id
-FROM session_flags;
-        """, language="sql")
-        
-        # Sample evaluation
-        df_demo = pd.DataFrame({
-            "user_id": [101, 101, 101, 101, 102],
-            "event_time": ["10:00", "10:15", "10:55", "11:05", "12:00"],
-            "prev_time": [None, "10:00", "10:15", "10:55", None],
-            "diff_min": [None, 15, 40, 10, None],
-            "is_new_session": [1, 0, 1, 0, 1],
-            "session_id": [1, 1, 2, 2, 1]
-        })
-        st.caption("Live Pipeline Output:")
-        st.dataframe(df_demo, use_container_width=True)
-
-    elif "DENSE_RANK" in selected_problem:
-        st.markdown("""
-        **Problem Statement:** Find the Top 3 most-watched Reels in each country. If there are ties in view count, they should share the same rank without skipping consecutive ranks.
-        """)
-        st.code("""
-WITH ranked_reels AS (
-    SELECT 
-        country,
-        reel_id,
-        view_count,
-        DENSE_RANK() OVER (
-            PARTITION BY country 
-            ORDER BY view_count DESC
-        ) AS rank_num
-    FROM reel_country_daily_metrics
-    WHERE ds = '2024-05-14'
-)
-SELECT country, reel_id, view_count, rank_num
-FROM ranked_reels
-WHERE rank_num <= 3
-ORDER BY country, rank_num;
-        """, language="sql")
-        
-        df_rank = pd.DataFrame({
-            "country": ["US", "US", "US", "US", "UK", "UK"],
-            "reel_id": [801, 805, 809, 812, 901, 902],
-            "view_count": [1500000, 1200000, 1200000, 950000, 800000, 750000],
-            "rank_num": [1, 2, 2, 3, 1, 2]
-        })
-        st.caption("Rank Output (Note DENSE_RANK preserves ties):")
-        st.dataframe(df_rank, use_container_width=True)
-
-    elif "ROWS BETWEEN" in selected_problem:
-        st.markdown("""
-        **Problem Statement:** Compute the 7-day rolling average watch duration for each creator, ordering by partition date `ds`.
-        """)
-        st.code("""
-SELECT 
-    creator_id,
-    ds,
-    daily_watch_sec,
-    -- Physical window frame of 6 preceding rows + current row
-    AVG(daily_watch_sec) OVER (
-        PARTITION BY creator_id 
-        ORDER BY ds 
-        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
-    ) AS rolling_7d_avg_sec,
-    SUM(daily_watch_sec) OVER (
-        PARTITION BY creator_id 
-        ORDER BY ds 
-        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
-    ) AS rolling_7d_sum_sec
-FROM creator_daily_stats;
-        """, language="sql")
-
-    else:
-        st.markdown("""
-        **Problem Statement:** Growth Accounting State Machine. Classify each user into one of four states:
-        `New`, `Retained`, `Churned`, or `Resurrected`.
-        """)
-        st.code("""
-SELECT 
-    COALESCE(t.user_id, y.user_id) AS user_id,
-    '2024-05-14' AS ds,
-    CASE 
-        WHEN y.user_id IS NULL AND t.user_id IS NOT NULL THEN 'New'
-        WHEN y.user_id IS NOT NULL AND t.user_id IS NOT NULL THEN 'Retained'
-        WHEN y.user_id IS NOT NULL AND t.user_id IS NULL THEN 'Churned'
-        WHEN y.user_id IS NULL AND t.user_id IS NOT NULL AND h.user_id IS NOT NULL THEN 'Resurrected'
-    END AS growth_state
-FROM today_active_users t
-FULL OUTER JOIN yesterday_active_users y ON t.user_id = y.user_id
-LEFT JOIN historical_users h ON t.user_id = h.user_id;
-        """, language="sql")
-
-    st.markdown("---")
-    st.markdown("### Distributed Query Optimization & Skew Mitigation")
-    col_skew1, col_skew2 = st.columns([6, 6])
-    
-    with col_skew1:
-        st.markdown("**The Data Skew Problem:**")
-        st.write("When joining on a key with extreme power-law distribution (e.g. celebrity account `creator_id = 999999` with 100M rows), Presto/Spark hashes all matching rows to a single reducer node, causing an OOM (Out of Memory) crash or 99% task stall.")
-        
-        st.markdown("**The Salting Solution:**")
-        st.code("""
--- 1. Salt the large skewed fact table
-SELECT 
-    CONCAT(creator_id, '_', CAST(FLOOR(RAND() * 10) AS VARCHAR)) AS salted_key,
-    watch_sec
-FROM skewed_fact_impressions;
-
--- 2. Explode the small dimension table by 10x
-SELECT 
-    CONCAT(creator_id, '_', CAST(s.salt AS VARCHAR)) AS salted_key,
-    creator_name
-FROM dim_creator
-CROSS JOIN (SELECT explode(sequence(0, 9)) AS salt) s;
-        """, language="sql")
-
-    with col_skew2:
-        st.markdown("**Distributed Join Strategy Matrix:**")
-        st.markdown("""
-        | Join Type | Left Table | Right Table | Network Cost | When to Use |
-        | :--- | :--- | :--- | :--- | :--- |
-        | **Broadcast Join** | Huge (>10TB) | Tiny (<100MB) | Low | Dim table fits in memory on all executors |
-        | **Shuffle Hash Join** | Large | Medium | High | Keys hashed and re-partitioned across cluster |
-        | **Sort-Merge Join** | Huge | Huge | High | Both datasets pre-sorted and bucketed on join key |
+        **Production Readiness & Search**
+        - **Module 7:** Ragas Evaluation & Production Guardrails
+        - **Module 8:** AI Engineering Competency Checklist
+        - **Module 9:** AI Tech Radar (Google Search Grounded)
         """)
 
 # ---------------------------------------------------------
-# MODULE 4: PYTHON SCRIPTING
+# MODULE 1: INTERACTIVE MERMAID RAG SEQUENCE DIAGRAM
 # ---------------------------------------------------------
-def render_module_4():
-    st.title("🐍 Module 4: Python & Data Pipeline Scripting")
-    st.caption("Meta DE Coding Interview Focus: Array Algorithms, Streaming Deques & JSON Parsers")
-    
-    selected_code = st.selectbox(
-        "Choose Python Interview Problem:",
-        [
-            "1. Merge Overlapping Intervals (Total Active Video Time)",
-            "2. Top K Frequent Elements / Heavy Hitters (Min-Heap)",
-            "3. Flatten Deeply Nested Telemetry JSON",
-            "4. Moving Average from Streaming Telemetry Window"
-        ]
-    )
-    
-    if "Merge Overlapping" in selected_code:
-        st.markdown("### Merge Intervals (`calculate_total_active_time`)")
-        st.write("Given an array of video playback time intervals `[start, end]`, merge all overlapping intervals and return the total net active watch time.")
-        
-        raw_input = st.text_input("Test Interval Array (JSON):", "[[1, 4], [3, 6], [8, 10], [9, 12], [15, 18]]")
-        
-        try:
-            intervals = json.loads(raw_input)
-            intervals.sort(key=lambda x: x[0])
-            
-            merged = []
-            for inv in intervals:
-                if not merged or merged[-1][1] < inv[0]:
-                    merged.append(inv)
-                else:
-                    merged[-1][1] = max(merged[-1][1], inv[1])
-                    
-            total_active = sum(inv[1] - inv[0] for inv in merged)
-            
-            st.success(f"✅ Merged Intervals: `{merged}` | Net Active Duration: **{total_active} seconds**")
-            
-            fig = go.Figure()
-            for idx, inv in enumerate(intervals):
-                fig.add_trace(go.Scatter(
-                    x=[inv[0], inv[1]], y=[idx, idx],
-                    mode='lines+markers', name=f"Raw [{inv[0]},{inv[1]}]",
-                    line=dict(width=6)
-                ))
-            for idx, inv in enumerate(merged):
-                fig.add_trace(go.Scatter(
-                    x=[inv[0], inv[1]], y=[-1 - idx, -1 - idx],
-                    mode='lines+markers', name=f"Merged [{inv[0]},{inv[1]}]",
-                    line=dict(color=META_BLUE, width=8)
-                ))
-            fig.update_layout(
-                title="Interval Timeline: Raw vs Merged",
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font=dict(color=TEXT_LIGHT),
-                height=300
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            
-        except Exception as e:
-            st.error(f"Invalid format: {e}. Provide valid JSON like [[1, 4], [3, 6]]")
-
-        st.code("""
-def calculate_total_active_time(intervals: list[list[int]]) -> int:
-    # Time Complexity: O(N log N) due to sorting | Space: O(N)
-    if not intervals:
-        return 0
-    intervals.sort(key=lambda x: x[0])
-    merged = [intervals[0]]
-    for start, end in intervals[1:]:
-        last_end = merged[-1][1]
-        if start <= last_end:
-            merged[-1][1] = max(last_end, end)
-        else:
-            merged.append([start, end])
-    return sum(end - start for start, end in merged)
-        """, language="python")
-
-    elif "Top K" in selected_code:
-        st.markdown("### Top K Frequent Elements (`find_heavy_hitters`)")
-        st.write("Find the top K most frequent hashtags in a live event stream using a Min-Heap.")
-        
-        tags_input = st.text_input("Stream of Hashtags (comma separated):", "reels, ai, meta, reels, tech, ai, reels, data, meta, reels")
-        k_val = st.slider("Select K Value:", 1, 5, 2)
-        
-        import collections, heapq
-        tags = [t.strip() for t in tags_input.split(",") if t.strip()]
-        counts = collections.Counter(tags)
-        top_k = heapq.nlargest(k_val, counts.items(), key=lambda item: item[1])
-        
-        st.success(f"Top {k_val} Heavy Hitters: {top_k}")
-        
-        st.code("""
-import collections, heapq
-
-def top_k_frequent(items: list[str], k: int) -> list[tuple[str, int]]:
-    # Time Complexity: O(N + M log K) where M is unique items
-    counts = collections.Counter(items)
-    # Min-heap of size K keeps memory footprint minimal
-    return heapq.nlargest(k, counts.items(), key=lambda x: x[1])
-        """, language="python")
-
-    elif "Flatten" in selected_code:
-        st.markdown("### Flatten Deeply Nested Telemetry JSON")
-        st.write("Convert arbitrary hierarchical telemetry dictionaries into flat single-level schemas suitable for relational data lakes.")
-        
-        nested_sample = {
-            "event_id": "evt_9918",
-            "device": {"os": "iOS", "version": {"major": 17, "minor": 4}},
-            "geo": {"country": "US", "city": "Seattle"},
-            "metrics": {"latency_ms": 142}
-        }
-        
-        st.write("**Input Nested Object:**")
-        st.json(nested_sample)
-        
-        def flatten_dict(d, parent_key='', sep='.'):
-            items = []
-            for k, v in d.items():
-                new_key = f"{parent_key}{sep}{k}" if parent_key else k
-                if isinstance(v, dict):
-                    items.extend(flatten_dict(v, new_key, sep=sep).items())
-                else:
-                    items.append((new_key, v))
-            return dict(items)
-            
-        flat = flatten_dict(nested_sample)
-        st.write("**Flattened Lake Record:**")
-        st.json(flat)
-
-    else:
-        st.markdown("### Moving Average from Data Stream")
-        st.code("""
-from collections import deque
-
-class MovingAverage:
-    def __init__(self, size: int):
-        self.size = size
-        self.queue = deque()
-        self.total_sum = 0.0
-
-    def next(self, val: float) -> float:
-        # O(1) Time Complexity per event
-        self.queue.append(val)
-        self.total_sum += val
-        if len(self.queue) > self.size:
-            self.total_sum -= self.queue.popleft()
-        return round(self.total_sum / len(self.queue), 2)
-        """, language="python")
-
-# ---------------------------------------------------------
-# MODULE 5: BIG DATA PIPELINES & RELIABILITY
-# ---------------------------------------------------------
-def render_module_5():
-    st.title("🔄 Module 5: Big Data Pipelines & Reliability")
-    st.caption("Designing Resilient, Idempotent Data Architectures with Circuit Breakers")
-    
-    st.markdown("### Interactive Idempotent Pipeline Runner")
-    st.write("Simulate an enterprise Airflow / Flink DAG with atomic partition swaps and data quality gates.")
-    
-    col_run1, col_run2 = st.columns(2)
-    with col_run1:
-        simulate_dq_failure = st.checkbox("🚨 Inject Synthetic Data Quality Anomaly (Null Spike / Duplicate PKs)")
-    with col_run2:
-        run_btn = st.button("🚀 Trigger Scheduled DAG Execution (ds='2024-05-14')", type="primary")
-
-    if run_btn:
-        st.markdown("#### DAG Execution Timeline")
-        progress = st.progress(0)
-        
-        stages = [
-            ("Stage 1: Extract & Write to Staging Path", 0.25, "s3://lake/staging/reels/ds=2024-05-14/"),
-            ("Stage 2: Run Deduplication & Primary Key Integrity", 0.50, "SELECT user_id, COUNT(*) HAVING COUNT(*) > 1"),
-            ("Stage 3: Data Quality Circuit Breaker Evaluation", 0.75, "Verify null_rate < 0.01% & row_count > 10,000,000"),
-            ("Stage 4: Atomic Partition Swap to Production Table", 1.0, "ALTER TABLE prod_reels SWAP PARTITION (ds='2024-05-14')")
-        ]
-        
-        for name, pct, detail in stages:
-            if simulate_dq_failure and pct == 0.75:
-                progress.progress(0.70)
-                st.error("❌ CIRCUIT BREAKER TRIGGERED: Quality check failed! 2.8% null user_id detected (threshold = 0.01%).")
-                st.warning("⚠️ ROLLBACK EXECUTED: Staging partition discarded. Production partition preserved. PagerDuty alerted.")
-                break
-            else:
-                progress.progress(pct)
-                st.success(f"✅ {name}\n\n`{detail}`")
-                
-        if not simulate_dq_failure:
-            st.balloons()
-
-    st.markdown("---")
-    st.markdown("### System Architecture Trade-off Matrix")
-    req_latency = st.select_slider(
-        "Select Business SLA Latency Requirement:",
-        options=["Sub-second (<100ms)", "Near Real-Time (1-5 min)", "Hourly (1-2 hr)", "Daily Batch (24 hr)"],
-        value="Hourly (1-2 hr)"
-    )
-    
-    if req_latency == "Sub-second (<100ms)":
-        st.info("**Architecture: Pure Streaming (Apache Flink + Kafka + RocksDB)**\n\n- Cost: High\n- Complexity: High\n- Storage: In-memory state with checkpointing to S3/HDFS\n- Use Case: Live Ad Bidding, Fraud Detection")
-    elif req_latency == "Near Real-Time (1-5 min)":
-        st.info("**Architecture: Micro-batch (Spark Structured Streaming + Iceberg)**\n\n- Cost: Medium-High\n- Complexity: Medium\n- Storage: Parquet files with fast metadata commits\n- Use Case: Creator Analytics Dashboard")
-    elif req_latency == "Hourly (1-2 hr)":
-        st.info("**Architecture: Incremental Batch (Presto/Spark on Hive)**\n\n- Cost: Medium\n- Complexity: Low-Medium\n- Storage: Hourly partition directories (`ds=.../hr=...`)\n- Use Case: Executive Metrics, Campaign Attributions")
-    else:
-        st.info("**Architecture: Daily Batch (Apache Airflow + Spark Full Overwrite)**\n\n- Cost: Lowest\n- Complexity: Lowest\n- Storage: Daily partitions with atomic swaps\n- Use Case: Financial Auditing, ML Training Set Generation")
-
-# ---------------------------------------------------------
-# MODULE 6: AI INFRASTRUCTURE
-# ---------------------------------------------------------
-def render_module_6():
-    st.title("🤖 Module 6: AI Infrastructure & Modern DE Workflows")
-    st.caption("Feature Stores, Streaming Vectors (FAISS) & Training-Serving Skew Detection")
-    
-    st.markdown("### Meta Recommendation Engine Data Flow")
-    st.graphviz_chart('''
-        digraph G {
-            rankdir=LR;
-            bgcolor="transparent";
-            node [fontname="sans-serif", fontcolor="white", color="#0666FE", style="filled", fillcolor="#1E293B", shape=box, rx=4];
-            edge [color="#64748B", fontcolor="#94A3B8", fontname="sans-serif", fontsize=10];
-            
-            App [label="Client App\\n(Instagram/FB)"];
-            Kafka [label="Kafka / Scribe\\n(Event Ingestion)"];
-            Flink [label="Apache Flink\\n(Feature Extraction)"];
-            Redis [label="Online Feature Store\\n(RocksDB/Redis)"];
-            Lake [label="Data Lake\\n(Apache Iceberg)"];
-            Spark [label="Spark Offline Job\\n(Batch Aggregates)"];
-            FAISS [label="Vector DB\\n(FAISS Embeddings)"];
-            Model [label="Ranking Engine\\n(DLRM Model)"];
-            
-            App -> Kafka [label="Watch / Click"];
-            Kafka -> Flink [label="Stream"];
-            Flink -> Redis [label="Low-latency write (<10ms)"];
-            Kafka -> Lake [label="Raw Parquet"];
-            Lake -> Spark [label="Daily Historical"];
-            Spark -> Redis [label="Bulk Sync"];
-            Spark -> FAISS [label="Index Embeddings"];
-            Redis -> Model [label="Realtime Features"];
-            FAISS -> Model [label="Candidate Retrieval"];
-        }
-    ''')
-    
-    st.markdown("---")
-    st.markdown("### Interactive Training-Serving Skew & Drift Monitor")
-    st.write("Adjust the serving feature drift to calculate real-time Population Stability Index (PSI).")
-    
-    drift_factor = st.slider("Simulate Serving Distribution Shift (Mean Offset):", 0.0, 15.0, 4.0, 0.5)
-    
-    np.random.seed(42)
-    train_dist = np.random.normal(50, 10, 2000)
-    serve_dist = np.random.normal(50 + drift_factor, 10 + (drift_factor * 0.2), 2000)
-    
-    # Calculate approximate PSI
-    bins = np.linspace(20, 90, 10)
-    train_counts, _ = np.histogram(train_dist, bins=bins)
-    serve_counts, _ = np.histogram(serve_dist, bins=bins)
-    
-    train_pct = np.maximum(train_counts / len(train_dist), 0.0001)
-    serve_pct = np.maximum(serve_counts / len(serve_dist), 0.0001)
-    psi = np.sum((serve_pct - train_pct) * np.log(serve_pct / train_pct))
-    
-    if psi < 0.1:
-        st.success(f"✅ PSI = **{psi:.3f}** (Negligible Drift. Model inference is statistically consistent with training data.)")
-    elif psi < 0.25:
-        st.warning(f"⚠️ PSI = **{psi:.3f}** (Moderate Feature Drift detected. Queue automated retraining pipeline.)")
-    else:
-        st.error(f"🚨 PSI = **{psi:.3f}** (CRITICAL TRAINING-SERVING SKEW! Model recommendations are degraded. Fallback to heuristic ranker.)")
-        
-    fig_drift = go.Figure()
-    fig_drift.add_trace(go.Histogram(x=train_dist, name="Training Distribution", opacity=0.6, marker_color=META_BLUE))
-    fig_drift.add_trace(go.Histogram(x=serve_dist, name="Live Serving Distribution", opacity=0.6, marker_color="#EF4444"))
-    fig_drift.update_layout(
-        barmode='overlay',
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(color=TEXT_LIGHT),
-        height=320,
-        margin=dict(l=10, r=10, t=20, b=20)
-    )
-    st.plotly_chart(fig_drift, use_container_width=True)
-
-# ---------------------------------------------------------
-# MODULE 7: DATA VISUALIZATION & REPORTING
-# ---------------------------------------------------------
-def render_module_7():
-    st.title("📈 Module 7: Data Visualization & Reporting Strategy")
-    st.caption("Cohort Retention Triangles, Funnel Conversions & Executive Telemetry")
-    
-    st.markdown("### Interactive Funnel Drop-off Analysis")
-    
-    col_sl1, col_sl2, col_sl3 = st.columns(3)
-    with col_sl1:
-        watched_3s_conv = st.slider("3s Watch Conversion (%)", 10, 80, 45)
-    with col_sl2:
-        liked_conv = st.slider("Like Conversion (%)", 1, 40, 12)
-    with col_sl3:
-        shared_conv = st.slider("Share Conversion (%)", 1, 20, 4)
-        
-    base_impressions = 1000000
-    w3s = base_impressions * (watched_3s_conv / 100)
-    liked = w3s * (liked_conv / 100)
-    shared = liked * (shared_conv / 100)
-    
-    fig_funnel = go.Figure(go.Funnel(
-        y=["1. Impressions", "2. Watched >= 3s", "3. Liked", "4. Shared"],
-        x=[base_impressions, w3s, liked, shared],
-        textinfo="value+percent initial+percent previous",
-        marker=dict(color=[META_BLUE, "#38BDF8", "#818CF8", "#C084FC"])
-    ))
-    fig_funnel.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=TEXT_LIGHT), height=300)
-    st.plotly_chart(fig_funnel, use_container_width=True)
-
-    st.markdown("---")
-    st.markdown("### Real-world Cohort Retention Triangle")
-    st.write("Notice how classic retention triangles leave future dates empty, rather than displaying zeroes.")
-    
-    cohort_decay = st.slider("Cohort Decay Factor:", 0.4, 0.9, 0.72)
-    
-    triangle_data = [
-        [100.0, round(100.0 * cohort_decay, 1), round(100.0 * (cohort_decay**2), 1), round(100.0 * (cohort_decay**3), 1)],
-        [100.0, round(100.0 * cohort_decay, 1), round(100.0 * (cohort_decay**2), 1), None],
-        [100.0, round(100.0 * cohort_decay, 1), None, None],
-        [100.0, None, None, None]
-    ]
-    
-    fig_heat = px.imshow(
-        triangle_data,
-        x=["Day 0", "Day 1", "Day 7", "Day 30"],
-        y=["2024-W16", "2024-W17", "2024-W18", "2024-W19"],
-        color_continuous_scale="Blues",
-        labels=dict(x="Retention Window", y="Acquisition Cohort", color="Retention %"),
-        text_auto=True
-    )
-    fig_heat.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=TEXT_LIGHT), height=300)
-    st.plotly_chart(fig_heat, use_container_width=True)
-
-# ---------------------------------------------------------
-# MODULE 8: BEHAVIORAL & OWNERSHIP
-# ---------------------------------------------------------
-def render_module_8():
-    st.title("🎯 Module 8: Behavioral & Ownership (Meta Core Values)")
-    st.caption("How to Structure DE Leadership, Trade-offs & Conflict Stories via the STAR Method")
-    
-    st.markdown("""
-    <div class="card">
-        <div class="label">Meta's 6 Official Core Values (Updated)</div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; font-size: 12px;">
-            <div><strong>1. Move Fast</strong><br/><span style="color:#94A3B8; font-size: 11px;">Iterate rapidly without fear of breaking things responsibly.</span></div>
-            <div><strong>2. Focus on Long-Term Impact</strong><br/><span style="color:#94A3B8; font-size: 11px;">Solve foundational engineering problems, not just symptoms.</span></div>
-            <div><strong>3. Build Awesome Things</strong><br/><span style="color:#94A3B8; font-size: 11px;">Raise the bar for quality and user craft.</span></div>
-            <div><strong>4. Live in the Future</strong><br/><span style="color:#94A3B8; font-size: 11px;">Embrace decentralized systems, AI workflows, and VR/MR.</span></div>
-            <div><strong>5. Be Direct & Respect Colleagues</strong><br/><span style="color:#94A3B8; font-size: 11px;">Give clear, actionable feedback and debate rigorously.</span></div>
-            <div><strong>6. Meta, Metamates, Me</strong><br/><span style="color:#94A3B8; font-size: 11px;">Stewardship for the company mission over individual siloed credit.</span></div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("### Interactive STAR Story Builder")
-    selected_val = st.selectbox(
-        "Target Meta Core Value:",
-        ["Move Fast", "Focus on Long-Term Impact", "Build Awesome Things", "Live in the Future", "Be Direct and Respect Your Colleagues", "Meta, Metamates, Me"]
-    )
-    
-    story_title = st.text_input("Story Title:", "Overcame 3-Hour Pipeline SLA Breach by Refactoring Shuffle Partitioning")
-    
-    s_col, t_col = st.columns(2)
-    with s_col:
-        sit = st.text_area("S - Situation (Context, scale, problem constraint):", "During the Black Friday traffic surge, our main attribution pipeline SLA breached by 3.5 hours, delaying advertiser billing metrics.")
-    with t_col:
-        tsk = st.text_area("T - Task (Your individual responsibility & ownership):", "As the lead DE on core monetization, I was tasked with diagnosing the bottleneck and restoring the SLA under 45 minutes without tripling cluster cost.")
-        
-    a_col, r_col = st.columns(2)
-    with a_col:
-        act = st.text_area("A - Action (Technical actions, trade-offs, courage):", "Profiled Spark DAG executors and identified extreme key skew in our ad_id join. Implemented salting on the top 100 viral campaigns and converted the advertiser dimension to a broadcast join.")
-    with r_col:
-        res = st.text_area("R - Result (Quantifiable business & engineering metrics):", "Pipeline runtime dropped from 4.5 hours to 38 minutes (86% reduction), saving $12,000/month in cloud compute and achieving 100% SLA compliance.")
-
-    if st.button("💾 Save STAR Story to My Blueprint Bank", type="primary"):
-        st.session_state.star_stories.append({
-            "value": selected_val,
-            "title": story_title,
-            "summary": f"**Situation:** {sit}\n\n**Action:** {act}\n\n**Result:** {res}"
-        })
-        st.success("Story successfully saved!")
-
-    if st.session_state.star_stories:
-        st.markdown("#### 📖 Saved STAR Stories:")
-        for idx, item in enumerate(st.session_state.star_stories):
-            with st.expander(f"⭐ [{item['value']}] {item['title']}"):
-                st.markdown(item["summary"])
-
-    st.markdown("---")
-    st.markdown("### ⏱️ Timed Mock Technical Screen Simulator")
-    st.write("Meta technical phone screens allow **exactly 45 minutes** for 1 SQL and 1 Python coding problem.")
-    
-    if st.button("Start 45-Minute Practice Clock"):
-        st.info("⏰ Timer active! Target pacing: 20 min for SQL (Window functions), 20 min for Python (Algorithms), 5 min for questions.")
-
-# ---------------------------------------------------------
-# MODULE 9: 4-WEEK ACTION ROADMAP
-# ---------------------------------------------------------
-def render_module_9():
-    st.title("📅 Module 9: Actionable 4-Week Preparation Roadmap")
-    st.caption("Day-by-Day Milestone Plan & Progress Tracker")
-    
-    tasks = st.session_state.checklist_state
-    completed = sum(1 for v in tasks.values() if v)
-    total = len(tasks)
-    progress_ratio = completed / total if total > 0 else 0
-    
-    st.progress(progress_ratio)
-    st.markdown(f"**Readiness Score:** `{completed} / {total}` Core Competencies Completed (`{int(progress_ratio*100)}%`)")
-    
-    st.write("---")
-    
-    col_w1, col_w2 = st.columns(2)
-    with col_w1:
-        st.markdown("#### Week 1: SQL Mastery & Array Algorithms")
-        for t in ["SQL Window Functions (Dense_Rank, Row_Number)", "Python Interval Merging & Stream Deque", "Star Schema vs Snowflake Trade-offs"]:
-            tasks[t] = st.checkbox(t, value=tasks.get(t, False), key=f"chk_{t}")
-            
-        st.markdown("#### Week 2: Advanced Data Modeling & Dimensions")
-        for t in ["SCD Type 2 Dimension Implementation", "Presto / Spark Shuffle & Salting for Data Skew", "Broadcast vs Hash Joins & Partition Pruning"]:
-            tasks[t] = st.checkbox(t, value=tasks.get(t, False), key=f"chk_{t}")
-
-    with col_w2:
-        st.markdown("#### Week 3: Big Data Pipelines & Metric RCA")
-        for t in ["Idempotent Backfill & Circuit Breakers", "Product Sense: Root Cause Analysis (RCA) Framework", "Feature Store & Training-Serving Skew Monitoring"]:
-            tasks[t] = st.checkbox(t, value=tasks.get(t, False), key=f"chk_{t}")
-
-        st.markdown("#### Week 4: Behavioral & Final Mock Screens")
-        for t in ["Cohort Retention Triangles & Funnel Conversions", "Write 5 Meta Core Values STAR Stories", "Complete 2 Full 45-min Timed Mock Screens"]:
-            tasks[t] = st.checkbox(t, value=tasks.get(t, False), key=f"chk_{t}")
-
-    st.markdown("---")
-    st.download_button(
-        label="📥 Export Preparation Progress (JSON)",
-        data=json.dumps(tasks, indent=2),
-        file_name="meta_de_prep_checklist.json",
-        mime="application/json"
-    )
-
-# ---------------------------------------------------------
-# MODULE 10: META TECH RADAR & ENGINEERING BLOGS
-# ---------------------------------------------------------
-def render_module_10():
-    st.title("📡 Module 10: Meta Tech Radar & Engineering Publications")
-    st.caption("Current Data Engineering Trends & Meta-Specific Engineering Blogs (engineering.fb.com) with Google Search Grounding")
+def render_rag_sequence():
+    st.title("🔁 Production RAG Pipeline: Interactive Sequence Diagram")
+    st.caption("Visualizing the end-to-end lifecycle of an enterprise Retrieval-Augmented Generation request in LangChain")
     
     st.markdown("""
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <div class="label" style="color: #60A5FA;">Real-Time Architectural Intelligence</div>
-                <div style="font-size: 13px; font-weight: 700; color: #FFFFFF; margin-top: 2px;">
-                    Google Search Grounded Semantic Knowledge Base
-                </div>
+                <div class="label" style="color: #60A5FA;">Foundational Architecture Reference</div>
+                <div style="font-weight: 700; font-size: 14px; margin-top: 4px;">Standard RAG Pipeline with Query Decomposition, Vector Search, Cross-Encoder Rerank & Guardrails</div>
             </div>
-            <button onclick="if(window.parent && window.parent.toggleSearchSidebar){window.parent.toggleSearchSidebar(true)}else if(window.toggleSearchSidebar){window.toggleSearchSidebar(true)}" style="background: #0666FE; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer;">
-                Open Slide-Over Radar 🔍
-            </button>
+            <div style="background: rgba(59, 130, 246, 0.15); border: 1px solid #3B82F6; border-radius: 4px; padding: 4px 10px; font-size: 11px; color: #93C5FD; font-family: monospace;">
+                P95 SLA: ~550ms
+            </div>
         </div>
-        <p style="font-size: 11.5px; color: #94A3B8; margin-top: 8px; margin-bottom: 0;">
-            Meta's data infrastructure evolves rapidly. Interviewers expect candidates to discuss modern paradigms beyond legacy Hadoop/Hive: C++ vectorized query execution (<a href="https://engineering.fb.com" target="_blank" style="color: #60A5FA;">Velox</a>), table formats (<a href="https://iceberg.apache.org" target="_blank" style="color: #60A5FA;">Apache Iceberg</a>), stateful stream processing (<a href="https://flink.apache.org" target="_blank" style="color: #60A5FA;">Flink</a>), and in-memory telemetry (<a href="https://engineering.fb.com" target="_blank" style="color: #60A5FA;">Scuba/Gorilla</a>).
+        <p style="font-size: 12px; color: #94A3B8; margin-top: 8px; line-height: 1.5;">
+            Click on any participant node or sequence phase below to inspect its latency budget, LangChain LCEL implementation, failure modes, and production scaling trade-offs.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("### Interactive In-App Semantic Search")
-    
-    col_q1, col_q2 = st.columns([8, 2])
-    with col_q1:
-        query_input = st.text_input(
-            "Search Query:",
-            value="Meta Velox unified execution engine Presto Spark",
-            placeholder="e.g. Meta Iceberg adoption, Flink Reels streaming, FAISS vector search..."
+    # Sequence steps details dictionary
+    steps_data = {
+        "1. Query Rewriter & HyDE": {
+            "actor": "QueryRewriter",
+            "latency": "25 - 45 ms",
+            "role": "Expands ambiguous user queries into multiple search angles and generates hypothetical document embeddings (HyDE) for superior semantic capture.",
+            "code": """from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+# Query expansion & HyDE prompt in LCEL
+rewrite_prompt = ChatPromptTemplate.from_template(
+    "Given the user question: {question}\\n"
+    "Generate 3 diverse sub-queries and a brief hypothetical passage "
+    "that would directly answer this question to maximize vector recall."
+)
+
+query_rewriter = rewrite_prompt | fast_llm | StrOutputParser()""",
+            "failure_modes": "Over-generation causing semantic drift; adding unnecessary latency if simple keyword queries don't need decomposition.",
+            "mitigation": "Add a lightweight classifier / regex filter to bypass rewriting on trivial lookups."
+        },
+        "2. Embedding Model": {
+            "actor": "Embedder",
+            "latency": "15 - 30 ms",
+            "role": "Translates the expanded text query into a dense mathematical vector (e.g. 768 or 1536 dimensions) using normalized floating-point embeddings.",
+            "code": """from langchain_google_genai import GoogleGenerativeAIEmbeddings
+# Or OpenAIEmbeddings(model="text-embedding-3-small")
+
+embeddings = GoogleGenerativeAIEmbeddings(
+    model="models/text-embedding-004",
+    task_type="retrieval_query"
+)
+
+# Convert query to dense vector
+query_vector = embeddings.embed_query("How to scale multi-tenant vector databases?")""",
+            "failure_modes": "Mismatch between query embedding model and index embedding model; embedding model token truncation without warning.",
+            "mitigation": "Enforce model version tagging in vector metadata and assert token lengths before vectorization."
+        },
+        "3. Vector DB (ANN Retrieval)": {
+            "actor": "VectorDB",
+            "latency": "15 - 35 ms",
+            "role": "Performs Approximate Nearest Neighbor (ANN) search over millions of indexed chunks using HNSW or IVF indices with metadata namespace pre-filtering.",
+            "code": """from langchain_pinecone import PineconeVectorStore
+# Or Qdrant, Chroma, FAISS
+
+vectorstore = PineconeVectorStore(index_name="knowledge-base", embedding=embeddings)
+
+# Retrieve top 20 candidate chunks with tenant filter
+retriever = vectorstore.as_retriever(
+    search_type="similarity",
+    search_kwargs={
+        "k": 20,
+        "filter": {"tenant_id": {"$eq": "org_42"}, "status": "active"}
+    }
+)""",
+            "failure_modes": "Post-filtering discarding 90% of candidates leaving too few chunks; high dimensionality curse degrading recall.",
+            "mitigation": "Use single-stage graph filtering (Qdrant/Pinecone) rather than post-search metadata filtering."
+        },
+        "4. Cross-Encoder Reranker": {
+            "actor": "Reranker",
+            "latency": "35 - 60 ms",
+            "role": "Takes the top 20 candidate documents and computes deep cross-attention with the query using a cross-encoder model (e.g. Cohere Rerank or BGE-Reranker), selecting top-4 high-precision chunks.",
+            "code": """from langchain.retrievers import ContextualCompressionRetriever
+from langchain_community.document_compressors import CohereRerank
+
+compressor = CohereRerank(model="rerank-english-v3.0", top_n=4)
+
+compression_retriever = ContextualCompressionRetriever(
+    base_compressor=compressor,
+    base_retriever=retriever
+)
+
+# Returns top 4 precisely scored documents
+high_relevance_docs = compression_retriever.invoke(user_query)""",
+            "failure_modes": "Sending too many documents (e.g. k=100) causes reranker throughput bottlenecks and spikes latency.",
+            "mitigation": "Cap initial retrieval to k=20 to keep reranking compute under 50ms."
+        },
+        "5. Prompt Builder (LCEL Format)": {
+            "actor": "PromptBuilder",
+            "latency": "1 - 3 ms",
+            "role": "Injects formatted context chunks, system instructions, and chat history into a ChatPromptTemplate with strict token boundary enforcement.",
+            "code": """from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+
+def format_docs(docs):
+    return "\\n\\n".join([f"--- Source: {d.metadata.get('source')} ---\\n{d.page_content}" for d in docs])
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are an enterprise AI assistant. Answer strictly using the provided context chunks. "
+               "Cite chunk sources. If the answer is not in the context, explicitly state you do not know.\\n\\n"
+               "CONTEXT:\\n{context}"),
+    ("human", "{question}")
+])""",
+            "failure_modes": "Lost-in-the-middle phenomenon: placing critical documents in the center of long contexts causes LLM attention degradation.",
+            "mitigation": "Sort retrieved documents so highest-relevance chunks appear at the very start and very end of the prompt context."
+        },
+        "6. LLM Inference & Streaming": {
+            "actor": "LLM",
+            "latency": "250 - 450 ms TTFT",
+            "role": "Generates the response tokens conditioned on the retrieved context chunks using speculative decoding and low-temperature parameters.",
+            "code": """from langchain_google_genai import ChatGoogleGenerativeAI
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    temperature=0.1,  # Low temperature for factual RAG
+    max_output_tokens=1024,
+    streaming=True
+)
+
+# Stream chunks to client in real-time
+# for chunk in chain.stream({"question": query}):
+#     print(chunk, end="", flush=True)""",
+            "failure_modes": "Hallucinating extraneous facts beyond retrieved evidence; API timeout during high concurrency.",
+            "mitigation": "Implement primary model with automated secondary fallback via `llm.with_fallbacks([backup_llm])`."
+        },
+        "7. Output Parser & Guardrails": {
+            "actor": "OutputParser",
+            "latency": "5 - 15 ms",
+            "role": "Parses output into typed Pydantic models, verifies citation consistency, and applies hallucination / PII filters before final delivery.",
+            "code": """from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticOutputParser
+from typing import List
+
+class RAGResponse(BaseModel):
+    answer: str = Field(description="Direct synthesis based on context")
+    citations: List[str] = Field(description="List of document chunk IDs cited")
+    confidence_score: float = Field(description="Estimated groundedness score from 0 to 1")
+
+parser = PydanticOutputParser(pydantic_object=RAGResponse)""",
+            "failure_modes": "JSON schema parsing exceptions when LLM outputs Markdown code blocks with preamble.",
+            "mitigation": "Use `.with_structured_output(RAGResponse)` which directly binds native function calling schemas."
+        }
+    }
+
+    # Interactive node selector
+    col_sel, col_stat = st.columns([8, 4])
+    with col_sel:
+        step_keys = list(steps_data.keys())
+        selected_step = st.selectbox(
+            "📍 Highlight Sequence Node & View Technical Deep Dive:",
+            step_keys,
+            index=2  # default Vector DB
         )
-    with col_q2:
-        st.write("")
-        st.write("")
-        trigger_search = st.button("Search Grounding", type="primary")
+    with col_stat:
+        st.markdown(f"""
+        <div style="background: {BG_CARD}; border: 1px solid {BORDER_DARK}; border-radius: 6px; padding: 10px 14px; margin-top: 6px;">
+            <div style="font-size: 10px; color: {TEXT_MUTED}; text-transform: uppercase; font-weight: 700;">Selected Component SLA</div>
+            <div style="font-size: 16px; font-weight: 700; color: {AI_EMERALD};">{steps_data[selected_step]['latency']}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    if trigger_search and query_input:
-        with st.spinner("Querying Google Search Grounding & Synthesizing Meta Engineering Publications..."):
+    # Embedded Mermaid.js Sequence Diagram with professional dark theme
+    mermaid_code = f"""%%{{init: {{
+  'theme': 'base',
+  'themeVariables': {{
+    'primaryColor': '#1E293B',
+    'primaryTextColor': '#F8FAFC',
+    'primaryBorderColor': '#3B82F6',
+    'lineColor': '#60A5FA',
+    'secondaryColor': '#0F172A',
+    'tertiaryColor': '#161F30',
+    'noteTextColor': '#E2E8F0',
+    'noteBkgColor': '#1E293B',
+    'noteBorderColor': '#334155',
+    'actorBkg': '#161F30',
+    'actorBorder': '#3B82F6',
+    'actorTextColor': '#FFFFFF',
+    'actorLineColor': '#334155',
+    'signalColor': '#38BDF8',
+    'signalTextColor': '#E2E8F0'
+  }}
+}}}}%%
+sequenceDiagram
+    autonumber
+    actor User as 👤 Client / App
+    participant Orch as 🦜 LCEL Orchestrator
+    participant Rewriter as 🔍 Query Rewriter (HyDE)
+    participant Embed as 🧮 Embedder (Dense)
+    participant VDB as 🗄️ Vector DB (Index)
+    participant Rerank as ⚡ Cross-Encoder Reranker
+    participant Prompt as 📝 ChatPromptTemplate
+    participant LLM as 🤖 LLM (Gemini 2.5)
+    participant Guard as 🛡️ Output Guardrail
+
+    User->>Orch: 1. invoke(question = "Scale Vector DB?")
+    activate Orch
+    
+    rect rgb(22, 31, 48)
+        note right of Orch: Query Expansion & Dense Vectorization
+        Orch->>Rewriter: 2. rewrite_and_expand(question)
+        Rewriter-->>Orch: 3. Sub-queries & hypothetical docs
+        Orch->>Embed: 4. embed_query(expanded_text)
+        Embed-->>Orch: 5. 768-dim query vector
+    end
+
+    rect rgb(15, 23, 42)
+        note right of Orch: Multi-Stage Hybrid Candidate Retrieval
+        Orch->>VDB: 6. similarity_search(vector, k=20, tenant_id)
+        VDB-->>Orch: 7. Top 20 raw candidate chunks
+        Orch->>Rerank: 8. rerank(candidates, query, top_n=4)
+        Rerank-->>Orch: 9. Top 4 high-precision chunks
+    end
+
+    rect rgb(22, 31, 48)
+        note right of Orch: Prompt Formulation & Generation
+        Orch->>Prompt: 10. format(context=top_docs, query)
+        Prompt-->>Orch: 11. ChatPromptValue with strict system prompt
+        Orch->>LLM: 12. stream(messages, temp=0.1)
+        LLM-->>Orch: 13. Candidate token stream
+    end
+
+    rect rgb(15, 23, 42)
+        note right of Orch: Structured Validation & Citation Check
+        Orch->>Guard: 14. validate_citations_and_schema(response)
+        Guard-->>Orch: 15. Verified Pydantic output
+    end
+
+    Orch-->>User: 16. Synthesized Answer with Cited Document Chunks
+    deactivate Orch
+"""
+
+    # Interactive HTML component containing Mermaid diagram with client-side click highlighting
+    html_mermaid = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+        <style>
+            body {{
+                background-color: transparent;
+                margin: 0;
+                padding: 10px;
+                font-family: 'Inter', system-ui, sans-serif;
+                color: #F8FAFC;
+                overflow-x: auto;
+            }}
+            #mermaid-container {{
+                display: flex;
+                justify-content: center;
+                background: #0B0F19;
+                border: 1px solid #2D3A4F;
+                border-radius: 8px;
+                padding: 16px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            }}
+            .mermaid {{
+                width: 100%;
+                text-align: center;
+            }}
+            /* Highlighting active actor */
+            .actor {{
+                cursor: pointer;
+                transition: transform 0.2s, filter 0.2s;
+            }}
+            .actor:hover {{
+                filter: drop-shadow(0 0 8px #3B82F6);
+            }}
+            .messageLine0, .messageLine1 {{
+                stroke-width: 1.5px !important;
+            }}
+            .highlight-banner {{
+                background: rgba(59, 130, 246, 0.12);
+                border: 1px solid #3B82F6;
+                border-radius: 6px;
+                padding: 8px 12px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 11.5px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="highlight-banner">
+            <div>
+                <span style="color: #60A5FA; font-weight: 700;">⚡ Active Focus:</span>
+                <span style="color: #FFFFFF; font-weight: 600;">{selected_step}</span>
+            </div>
+            <div style="color: #94A3B8; font-family: monospace;">
+                Actor: {steps_data[selected_step]['actor']}
+            </div>
+        </div>
+        <div id="mermaid-container">
+            <div class="mermaid">
+{mermaid_code}
+            </div>
+        </div>
+        <script>
+            mermaid.initialize({{
+                startOnLoad: true,
+                securityLevel: 'loose',
+                theme: 'dark'
+            }});
+        </script>
+    </body>
+    </html>
+    """
+
+    st.components.v1.html(html_mermaid, height=520, scrolling=True)
+
+    # Detailed Step Inspection Card
+    step_info = steps_data[selected_step]
+    st.markdown(f"### 🔍 Detailed Inspection: {selected_step}")
+    
+    col_d1, col_d2 = st.columns([6, 6])
+    with col_d1:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label" style="color: {AI_CYAN};">Core Functional Responsibility</div>
+            <p style="margin-top: 6px; font-size: 13px; color: #E2E8F0; line-height: 1.5;">{step_info['role']}</p>
+            <div style="margin-top: 12px;">
+                <span class="label" style="color: {AI_ROSE};">⚠️ Production Failure Mode:</span>
+                <div style="font-size: 11.5px; color: #FCA5A5; margin-top: 3px;">{step_info['failure_modes']}</div>
+            </div>
+            <div style="margin-top: 10px;">
+                <span class="label" style="color: {AI_EMERALD};">🛡️ Architectural Mitigation:</span>
+                <div style="font-size: 11.5px; color: #6EE7B7; margin-top: 3px;">{step_info['mitigation']}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_d2:
+        st.markdown(f"**LangChain / LCEL Implementation Code:**")
+        st.code(step_info['code'], language="python")
+
+# ---------------------------------------------------------
+# MODULE 2: SLIDER-BASED SCALING COST & TOKEN CALCULATOR
+# ---------------------------------------------------------
+def render_cost_calculator():
+    st.title("💰 Scaling Cost & Token Consumption Calculator")
+    st.caption("Estimate token volume, monthly infrastructure spend, and cache savings when scaling LangChain applications")
+
+    st.markdown("""
+    <div class="card">
+        <div class="label" style="color: #F59E0B;">Production LLM Economics</div>
+        <p style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
+            In production RAG systems, retrieved context chunks (e.g. 5 chunks × 350 tokens = 1,750 tokens) dominate prompt input tokens. 
+            Adjust query volumes and token parameters below to simulate exact monthly operational costs across top foundation models.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Input Sliders
+    col_s1, col_s2, col_s3 = st.columns(3)
+    
+    with col_s1:
+        st.markdown("#### 📈 Query Volume & Traffic")
+        daily_queries = st.slider(
+            "Daily Inbound Queries",
+            min_value=1000,
+            max_value=2000000,
+            value=100000,
+            step=5000,
+            format="%d queries"
+        )
+        monthly_queries = daily_queries * 30.5
+        st.caption(f"Monthly Queries: **{monthly_queries:,.0f}** (~{daily_queries/86400:.1f} QPS average)")
+
+        cache_hit_rate = st.slider(
+            "Semantic / Prompt Cache Hit Rate (%)",
+            min_value=0,
+            max_value=90,
+            value=35,
+            step=5,
+            help="Percentage of incoming queries answered via similarity cache without hitting the foundation LLM"
+        )
+
+    with col_s2:
+        st.markdown("#### 📝 Token Sizes per Query")
+        user_prompt_tokens = st.slider(
+            "Base Question + System Prompt Tokens",
+            min_value=50,
+            max_value=1500,
+            value=350,
+            step=25
+        )
+        
+        retrieved_chunks = st.slider(
+            "Top-K Retrieved Context Chunks",
+            min_value=1,
+            max_value=20,
+            value=5,
+            step=1
+        )
+        
+        tokens_per_chunk = st.slider(
+            "Average Tokens per Chunk",
+            min_value=100,
+            max_value=1000,
+            value=350,
+            step=50
+        )
+        
+        total_context_tokens = retrieved_chunks * tokens_per_chunk
+        total_input_tokens = user_prompt_tokens + total_context_tokens
+        st.caption(f"Total Input per Query: **{total_input_tokens:,} tokens** ({total_context_tokens:,} from context)")
+
+    with col_s3:
+        st.markdown("#### 📤 Output Tokens & Model")
+        output_tokens = st.slider(
+            "Average Completion / Output Tokens",
+            min_value=50,
+            max_value=2500,
+            value=400,
+            step=50
+        )
+
+        model_catalog = {
+            "Gemini 2.5 Flash (Recommended for RAG)": {
+                "input_per_m": 0.075,
+                "output_per_m": 0.30,
+                "cached_input_per_m": 0.01875,
+                "provider": "Google",
+                "context_window": "1M tokens"
+            },
+            "Gemini 1.5 Pro (Complex Reasoning)": {
+                "input_per_m": 1.25,
+                "output_per_m": 5.00,
+                "cached_input_per_m": 0.3125,
+                "provider": "Google",
+                "context_window": "2M tokens"
+            },
+            "GPT-4o (Flagship Multimodal)": {
+                "input_per_m": 2.50,
+                "output_per_m": 10.00,
+                "cached_input_per_m": 1.25,
+                "provider": "OpenAI",
+                "context_window": "128k tokens"
+            },
+            "GPT-4o-mini (Lightweight)": {
+                "input_per_m": 0.15,
+                "output_per_m": 0.60,
+                "cached_input_per_m": 0.075,
+                "provider": "OpenAI",
+                "context_window": "128k tokens"
+            },
+            "Claude 3.5 Sonnet": {
+                "input_per_m": 3.00,
+                "output_per_m": 15.00,
+                "cached_input_per_m": 0.75,
+                "provider": "Anthropic",
+                "context_window": "200k tokens"
+            },
+            "Llama 3 70B (Self-Hosted vLLM on 2x A100 GPUs)": {
+                "input_per_m": 0.35, # Blended compute amortization
+                "output_per_m": 0.35,
+                "cached_input_per_m": 0.05,
+                "provider": "Self-Hosted",
+                "context_window": "128k tokens"
+            }
+        }
+
+        selected_model_name = st.selectbox("Foundation Model", list(model_catalog.keys()))
+        selected_model = model_catalog[selected_model_name]
+
+    # Math calculations
+    effective_queries = monthly_queries * (1 - (cache_hit_rate / 100))
+    cached_queries = monthly_queries * (cache_hit_rate / 100)
+
+    # Monthly Token totals
+    uncached_input_tokens_m = (effective_queries * total_input_tokens) / 1_000_000
+    uncached_output_tokens_m = (effective_queries * output_tokens) / 1_000_000
+    total_tokens_billions = (monthly_queries * (total_input_tokens + output_tokens)) / 1_000_000_000
+
+    # Pricing calculation
+    cost_input = uncached_input_tokens_m * selected_model["input_per_m"]
+    cost_output = uncached_output_tokens_m * selected_model["output_per_m"]
+    total_monthly_cost = cost_input + cost_output
+
+    # Without cache cost
+    full_input_tokens_m = (monthly_queries * total_input_tokens) / 1_000_000
+    full_output_tokens_m = (monthly_queries * output_tokens) / 1_000_000
+    cost_without_cache = (full_input_tokens_m * selected_model["input_per_m"]) + (full_output_tokens_m * selected_model["output_per_m"])
+    monthly_savings = max(0, cost_without_cache - total_monthly_cost)
+    cost_per_query = total_monthly_cost / monthly_queries if monthly_queries else 0
+
+    st.markdown("---")
+    st.markdown("### 📊 Monthly Sizing & Financial Summary")
+
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+    with kpi1:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label">Monthly Total Spend</div>
+            <div style="font-size: 24px; font-weight: 700; color: {AI_BLUE}; margin: 4px 0;">${total_monthly_cost:,.2f}</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">Annualized: ${total_monthly_cost * 12:,.2f}/yr</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with kpi2:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label">Unit Economics (CPM)</div>
+            <div style="font-size: 24px; font-weight: 700; color: {AI_EMERALD}; margin: 4px 0;">${cost_per_query * 1000:,.3f}</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">${cost_per_query:,.5f} per query</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with kpi3:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label">Monthly Cache Savings</div>
+            <div style="font-size: 24px; font-weight: 700; color: {AI_AMBER}; margin: 4px 0;">${monthly_savings:,.2f}</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">{cache_hit_rate}% queries intercepted in &lt;15ms</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with kpi4:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label">Token Volume Processed</div>
+            <div style="font-size: 24px; font-weight: 700; color: {AI_PURPLE}; margin: 4px 0;">{total_tokens_billions:,.2f}B</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">{uncached_input_tokens_m:,.1f}M Input + {uncached_output_tokens_m:,.1f}M Output</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Visualization: Scaling projection curves across models
+    col_chart1, col_chart2 = st.columns([6, 6])
+    
+    with col_chart1:
+        st.markdown("#### Cost Scaling Curve Across Query Volumes")
+        sample_volumes = [10_000, 50_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000]
+        
+        df_curves = []
+        for v in sample_volumes:
+            eff_v = v * (1 - (cache_hit_rate / 100))
+            in_m = (eff_v * total_input_tokens) / 1_000_000
+            out_m = (eff_v * output_tokens) / 1_000_000
+            for m_name, m_spec in model_catalog.items():
+                short_name = m_name.split(" ")[0] + " " + m_name.split(" ")[1]
+                c = (in_m * m_spec["input_per_m"]) + (out_m * m_spec["output_per_m"])
+                df_curves.append({"Monthly Queries": v, "Model": short_name, "Monthly Cost ($)": c})
+
+        df_curves_df = pd.DataFrame(df_curves)
+        fig_scale = px.line(
+            df_curves_df,
+            x="Monthly Queries",
+            y="Monthly Cost ($)",
+            color="Model",
+            markers=True,
+            log_x=True,
+            log_y=True,
+            title="Monthly Cost vs Query Volume (Log-Log Scale)"
+        )
+        fig_scale.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color=TEXT_LIGHT, size=11),
+            legend=dict(orientation="h", y=-0.3),
+            margin=dict(l=10, r=10, t=30, b=10)
+        )
+        st.plotly_chart(fig_scale, use_container_width=True)
+
+    with col_chart2:
+        st.markdown("#### Spend Breakdown & Cache Efficiency")
+        labels = ["Prompt Input Spend", "Completion Output Spend", "Saved by Caching"]
+        values = [cost_input, cost_output, monthly_savings]
+        colors = [AI_BLUE, AI_PURPLE, AI_EMERALD]
+
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.4, marker=dict(colors=colors))])
+        fig_pie.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color=TEXT_LIGHT, size=11),
+            margin=dict(l=10, r=10, t=20, b=10),
+            legend=dict(orientation="h", y=-0.2)
+        )
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+    st.markdown("""
+    <div style="background: #162032; border: 1px solid #29384D; border-radius: 6px; padding: 12px; margin-top: 14px;">
+        <div style="font-weight: 700; font-size: 12px; color: #60A5FA; margin-bottom: 4px;">💡 LangChain Production Architecture Tip:</div>
+        <div style="font-size: 11.5px; color: #CBD5E1; line-height: 1.5;">
+            By integrating <code>langchain.cache.RedisSemanticCache</code> with a cosine distance threshold of <code>0.10</code>, 
+            repetitive enterprise queries (e.g. employee FAQ lookups or customer billing questions) are returned in under 12ms without invoking external LLMs, 
+            saving thousands of dollars per month while reducing latency by 95%.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# MODULE 3: VECTOR DB CONFIGURATOR & SCALING TRADE-OFFS
+# ---------------------------------------------------------
+def render_vector_db_configurator():
+    st.title("🗄️ Vector Database Configurator & Scaling Trade-offs")
+    st.caption("Benchmark memory footprints, index algorithms, latency, and LangChain integration patterns across vector engines")
+
+    # Database Specs Catalog
+    vector_dbs = {
+        "Pinecone (Serverless)": {
+            "type": "Managed Cloud Serverless",
+            "index_algo": "Proprietary HNSW + Graph Partitioning",
+            "p95_latency_ms": 22,
+            "recall_pct": 98.5,
+            "filtering_power": 9.5,
+            "scalability": 10.0,
+            "ops_simplicity": 10.0,
+            "cost_score": 7.0,
+            "quantization": "Automated SQ8 / FP16",
+            "best_for": "Zero-maintenance production scale, multi-tenant SaaS, enterprise isolation.",
+            "langchain_pkg": "langchain_pinecone",
+            "snippet": """from langchain_pinecone import PineconeVectorStore
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+
+# Ingest and query Pinecone serverless index
+vectorstore = PineconeVectorStore(
+    index_name="production-rag",
+    embedding=embeddings,
+    namespace="tenant_acme_corp"
+)
+
+# Metadata filtered retrieval
+retriever = vectorstore.as_retriever(
+    search_kwargs={"k": 5, "filter": {"doc_category": "finance"}}
+)"""
+        },
+        "FAISS (Facebook AI Similarity Search)": {
+            "type": "In-Memory C++ / GPU Library",
+            "index_algo": "HNSW / IVF-PQ / Flat",
+            "p95_latency_ms": 4,
+            "recall_pct": 97.0,
+            "filtering_power": 4.5,
+            "scalability": 6.5,
+            "ops_simplicity": 6.0,
+            "cost_score": 9.5,
+            "quantization": "IVF-PQ (90% RAM reduction)",
+            "best_for": "Local development, low-latency microservices, sidecar containers, ephemeral search.",
+            "langchain_pkg": "langchain_community.vectorstores",
+            "snippet": """import faiss
+from langchain_community.vectorstores import FAISS
+from langchain_community.docstore.in_memory import InMemoryDocstore
+
+# Initialize exact or HNSW FAISS index
+dimension = 768
+index = faiss.IndexHNSWFlat(dimension, 32)
+vectorstore = FAISS(
+    embedding_function=embeddings,
+    index=index,
+    docstore=InMemoryDocstore(),
+    index_to_docstore_id={}
+)
+
+# Persist and reload locally
+vectorstore.save_local("faiss_index_dir")
+loaded_store = FAISS.load_local("faiss_index_dir", embeddings, allow_dangerous_deserialization=True)"""
+        },
+        "Chroma": {
+            "type": "Embedded / Client-Server",
+            "index_algo": "HNSW (hnswlib)",
+            "p95_latency_ms": 18,
+            "recall_pct": 98.0,
+            "filtering_power": 7.5,
+            "scalability": 6.0,
+            "ops_simplicity": 9.5,
+            "cost_score": 9.0,
+            "quantization": "FP32 default",
+            "best_for": "Rapid prototyping, internal tooling, desktop apps, small-to-medium datasets (<2M vectors).",
+            "langchain_pkg": "langchain_chroma",
+            "snippet": """from langchain_chroma import Chroma
+
+# Local persistent directory storage
+vectorstore = Chroma(
+    collection_name="knowledge_store",
+    embedding_function=embeddings,
+    persist_directory="./chroma_db"
+)
+
+# Add texts and similarity search with score
+vectorstore.add_texts(texts=["LangChain LCEL guide", "Vector DB benchmarks"])
+results = vectorstore.similarity_search_with_relevance_scores("vector search", k=3)"""
+        },
+        "Qdrant": {
+            "type": "Rust Cloud-Native / Self-Hosted",
+            "index_algo": "Custom HNSW with Payload Storage",
+            "p95_latency_ms": 12,
+            "recall_pct": 99.0,
+            "filtering_power": 10.0,
+            "scalability": 9.5,
+            "ops_simplicity": 8.0,
+            "cost_score": 8.5,
+            "quantization": "Scalar (SQ8) & Binary (BQ)",
+            "best_for": "Heavy metadata filtering, hybrid vector/keyword search, distributed Kubernetes clusters.",
+            "langchain_pkg": "langchain_qdrant",
+            "snippet": """from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+
+client = QdrantClient(url="http://localhost:6333")
+
+vectorstore = QdrantVectorStore(
+    client=client,
+    collection_name="support_docs",
+    embedding=embeddings
+)
+
+# Query with combined payload filtering
+retriever = vectorstore.as_retriever(
+    search_kwargs={
+        "k": 5,
+        "filter": {"must": [{"key": "permission", "match": {"value": "admin"}}]}
+    }
+)"""
+        },
+        "Milvus / Zilliz": {
+            "type": "Distributed Kubernetes Vector DB",
+            "index_algo": "Knowhere (HNSW, SCaNN, DiskANN)",
+            "p95_latency_ms": 15,
+            "recall_pct": 98.5,
+            "filtering_power": 8.5,
+            "scalability": 10.0,
+            "ops_simplicity": 5.5,
+            "cost_score": 7.5,
+            "quantization": "DiskANN & Scalar Quantization",
+            "best_for": "Massive enterprise scale (100M to billions of vectors), sharded cluster deployments.",
+            "langchain_pkg": "langchain_milvus",
+            "snippet": """from langchain_milvus import Milvus
+
+vectorstore = Milvus(
+    embedding_function=embeddings,
+    connection_args={"host": "milvus-standalone", "port": "19530"},
+    collection_name="enterprise_vectors",
+    auto_id=True
+)
+
+retriever = vectorstore.as_retriever(search_kwargs={"expr": "views >= 100", "k": 10})"""
+        },
+        "pgvector (PostgreSQL)": {
+            "type": "Relational Extension",
+            "index_algo": "HNSW / IVFFlat",
+            "p95_latency_ms": 28,
+            "recall_pct": 96.5,
+            "filtering_power": 10.0,
+            "scalability": 7.0,
+            "ops_simplicity": 8.5,
+            "cost_score": 9.0,
+            "quantization": "Halfvec (FP16) & Bit vectors",
+            "best_for": "Teams already on Postgres, unified ACID SQL joins with vector search, single-database architecture.",
+            "langchain_pkg": "langchain_postgres",
+            "snippet": """from langchain_postgres import PGVector
+from sqlalchemy import create_engine
+
+connection = "postgresql+psycopg://user:password@localhost:5432/ragdb"
+
+vectorstore = PGVector(
+    embeddings=embeddings,
+    collection_name="legal_contracts",
+    connection=connection,
+    use_jsonb=True
+)
+
+# Integrated SQL + Vector query
+docs = vectorstore.similarity_search("liability limitation clause", k=5)"""
+        }
+    }
+
+    # Configuration Controls
+    col_c1, col_c2, col_c3 = st.columns(3)
+    
+    with col_c1:
+        selected_vdb = st.selectbox(
+            "Select Vector Database Engine:",
+            list(vector_dbs.keys()),
+            index=0
+        )
+        vdb_info = vector_dbs[selected_vdb]
+
+    with col_c2:
+        vector_count = st.select_slider(
+            "Dataset Scale (Number of Vectors):",
+            options=[10_000, 50_000, 200_000, 1_000_000, 5_000_000, 20_000_000, 50_000_000],
+            value=1_000_000,
+            format_func=lambda x: f"{x:,.0f} vectors"
+        )
+
+    with col_c3:
+        dimensions = st.selectbox(
+            "Embedding Dimensions:",
+            [384, 768, 1536, 3072],
+            index=1,
+            help="384 (MiniLM), 768 (Gemini/BERT), 1536 (OpenAI small), 3072 (OpenAI large)"
+        )
+
+    # Memory and storage sizing math
+    # Raw float32 vector: dimensions * 4 bytes
+    bytes_per_vector = dimensions * 4
+    raw_vector_bytes = vector_count * bytes_per_vector
+    raw_vector_gb = raw_vector_bytes / (1024 ** 3)
+    
+    # HNSW graph overhead multiplier (~1.5x - 2.0x raw vector size)
+    index_multiplier = 1.6
+    hnsw_index_gb = raw_vector_gb * index_multiplier
+    total_uncompressed_ram_gb = raw_vector_gb + hnsw_index_gb
+    
+    # Quantized sizes
+    sq8_compressed_ram_gb = total_uncompressed_ram_gb * 0.35
+    pq_compressed_ram_gb = total_uncompressed_ram_gb * 0.15
+
+    st.markdown("---")
+    st.markdown("### 📐 Memory Footprint & Hardware Sizing")
+
+    m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+    with m_col1:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label">Raw Vector Data</div>
+            <div style="font-size: 20px; font-weight: 700; color: {AI_BLUE}; margin: 4px 0;">{raw_vector_gb:.2f} GB</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">{vector_count:,.0f} × {dimensions} dims (FP32)</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with m_col2:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label">HNSW Index Overhead</div>
+            <div style="font-size: 20px; font-weight: 700; color: {AI_PURPLE}; margin: 4px 0;">{hnsw_index_gb:.2f} GB</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">Graph neighbor lists (M=16, efC=64)</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with m_col3:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label">RAM Required (Uncompressed)</div>
+            <div style="font-size: 20px; font-weight: 700; color: {AI_AMBER}; margin: 4px 0;">{total_uncompressed_ram_gb:.2f} GB</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">Full memory-resident index</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with m_col4:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label">RAM with SQ8 Quantization</div>
+            <div style="font-size: 20px; font-weight: 700; color: {AI_EMERALD}; margin: 4px 0;">{sq8_compressed_ram_gb:.2f} GB</div>
+            <div style="font-size: 11px; color: {TEXT_MUTED};">65% savings with &lt;1% recall loss</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Deep Comparative Radar Chart
+    st.markdown("---")
+    st.markdown("### ⚖️ Architectural Trade-off Radar (6-Factor Analysis)")
+    
+    r_cats = ['Low Latency (Speed)', 'Recall Precision', 'Metadata Filtering', 'Horizontal Scalability', 'Ops Simplicity', 'Cost Efficiency']
+    
+    fig_v_radar = go.Figure()
+    
+    # Trace for selected DB
+    sel_vals = [
+        10 - (vdb_info['p95_latency_ms'] / 3.5), # higher is faster
+        (vdb_info['recall_pct'] - 90) * 1.0,
+        vdb_info['filtering_power'],
+        vdb_info['scalability'],
+        vdb_info['ops_simplicity'],
+        vdb_info['cost_score']
+    ]
+    # normalize between 1 and 10
+    sel_vals = [max(2, min(10, v)) for v in sel_vals]
+
+    fig_v_radar.add_trace(go.Scatterpolar(
+        r=sel_vals + [sel_vals[0]],
+        theta=r_cats + [r_cats[0]],
+        fill='toself',
+        name=selected_vdb,
+        line=dict(color=AI_BLUE, width=3),
+        fillcolor='rgba(59, 130, 246, 0.3)'
+    ))
+
+    # Add a reference baseline (Pinecone vs Qdrant vs FAISS)
+    ref_pinecone = [7.5, 8.5, 9.5, 10.0, 10.0, 7.0]
+    fig_v_radar.add_trace(go.Scatterpolar(
+        r=ref_pinecone + [ref_pinecone[0]],
+        theta=r_cats + [r_cats[0]],
+        name='Pinecone Reference',
+        line=dict(color='#94A3B8', dash='dot', width=1.5)
+    ))
+
+    fig_v_radar.update_layout(
+        polar=dict(
+            radialaxis=dict(visible=True, range=[0, 10], color=TEXT_MUTED, gridcolor=BORDER_DARK),
+            angularaxis=dict(color=TEXT_LIGHT, gridcolor=BORDER_DARK)
+        ),
+        legend=dict(orientation="h", y=-0.15, x=0.5, xanchor="center"),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(color=TEXT_LIGHT, size=11),
+        height=320,
+        margin=dict(l=20, r=20, t=10, b=30)
+    )
+
+    col_rad, col_spec = st.columns([6, 6])
+    with col_rad:
+        st.plotly_chart(fig_v_radar, use_container_width=True)
+
+    with col_spec:
+        st.markdown(f"""
+        <div class="card">
+            <div class="label" style="color: {AI_CYAN};">Profile: {selected_vdb}</div>
+            <div style="margin-top: 8px; font-size: 12.5px; line-height: 1.6;">
+                <div><strong>Deployment Model:</strong> {vdb_info['type']}</div>
+                <div><strong>Indexing Algorithm:</strong> {vdb_info['index_algo']}</div>
+                <div><strong>Typical P95 Latency:</strong> ~{vdb_info['p95_latency_ms']} ms</div>
+                <div><strong>Recall Accuracy:</strong> ~{vdb_info['recall_pct']}%</div>
+                <div><strong>Quantization Support:</strong> {vdb_info['quantization']}</div>
+                <div style="margin-top: 6px; color: #60A5FA;"><strong>Recommended Best For:</strong> {vdb_info['best_for']}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        st.markdown(f"**LangChain Ingestion & Retriever Snippet ({vdb_info['langchain_pkg']}):**")
+        st.code(vdb_info['snippet'], language="python")
+
+# ---------------------------------------------------------
+# MODULE 4: LANGCHAIN LCEL & RUNNABLE PROTOCOL
+# ---------------------------------------------------------
+def render_lcel_deep_dive():
+    st.title("🦜 LangChain Expression Language (LCEL) & Runnable Architecture")
+    st.caption("Mastering the declarative composition pattern powering modern production LangChain systems")
+
+    st.markdown("""
+    <div class="card">
+        <div class="label" style="color: #60A5FA;">The Runnable Protocol</div>
+        <p style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
+            LCEL replaces legacy imperative chains (like <code>RetrievalQA</code> or <code>LLMChain</code>) with a unified functional interface.
+            Every component implements <code>Runnable</code>, providing automatic async execution (<code>ainvoke</code>), batch processing (<code>batch</code>), 
+            and token-by-token streaming (<code>stream</code>) with zero boilerplate.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    tab_pipe, tab_stream, tab_fallback, tab_routing = st.tabs([
+        "🔗 Pipe Composition (|)",
+        "🌊 Streaming & Async",
+        "🛡️ Fallbacks & Retries",
+        "🔀 Dynamic Branch Routing"
+    ])
+
+    with tab_pipe:
+        st.markdown("#### The Standard LCEL RAG Composition")
+        st.code("""from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_pinecone import PineconeVectorStore
+
+# 1. Setup Retriever and LLM
+embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+vectorstore = PineconeVectorStore(index_name="docs", embedding=embeddings)
+retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
+
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.1)
+
+# 2. Define Prompt Template
+template = \"\"\"Answer the question based only on the following context:
+{context}
+
+Question: {question}\"\"\"
+prompt = ChatPromptTemplate.from_template(template)
+
+def format_docs(docs):
+    return "\\n\\n".join(doc.page_content for doc in docs)
+
+# 3. Declarative Chain Assembly with the Pipe Operator (|)
+rag_chain = (
+    RunnableParallel({
+        "context": retriever | format_docs,
+        "question": RunnablePassthrough()
+    })
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+# 4. Invoke
+response = rag_chain.invoke("What are the advantages of LCEL over legacy chains?")
+print(response)""", language="python")
+
+    with tab_stream:
+        st.markdown("#### Token Streaming with astream & astream_events")
+        st.code("""import asyncio
+
+# Synchronous streaming
+for chunk in rag_chain.stream("Explain vector indexing in 3 sentences"):
+    print(chunk, end="", flush=True)
+
+# Async streaming for FastAPI / WebSockets with event metadata
+async def stream_rag_tokens(query: str):
+    async for event in rag_chain.astream_events(query, version="v2"):
+        kind = event["event"]
+        if kind == "on_chat_model_stream":
+            content = event["data"]["chunk"].content
+            if content:
+                yield content  # Yield tokens directly to SSE / WebSocket
+        elif kind == "on_retriever_end":
+            docs = event["data"]["output"]
+            print(f"[Trace] Retrieved {len(docs)} documents")""", language="python")
+
+    with tab_fallback:
+        st.markdown("#### Production Fallback Chains for 99.99% Availability")
+        st.code("""from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
+
+# Primary flagship model with aggressive timeout
+primary_llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    request_timeout=3.0,
+    max_retries=1
+)
+
+# Secondary failover model
+backup_llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    request_timeout=5.0
+)
+
+# Automated failover runnable: if Gemini times out or hits 429, switches to OpenAI instantly
+robust_llm = primary_llm.with_fallbacks([backup_llm])
+
+robust_chain = prompt | robust_llm | StrOutputParser()
+output = robust_chain.invoke({"context": "...", "question": "..."})""", language="python")
+
+    with tab_routing:
+        st.markdown("#### Dynamic Conditional Routing with RunnableBranch")
+        st.code("""from langchain_core.runnables import RunnableBranch
+
+# Classify intent
+intent_classifier = (
+    ChatPromptTemplate.from_template("Classify user query into 'coding', 'billing', or 'general': {query}")
+    | primary_llm
+    | StrOutputParser()
+)
+
+coding_chain = coding_prompt | specialized_coding_llm | StrOutputParser()
+billing_chain = billing_prompt | strict_schema_llm | StrOutputParser()
+general_chain = general_prompt | fast_llm | StrOutputParser()
+
+# Dynamic router branch
+router = RunnableBranch(
+    (lambda x: "coding" in x["intent"].lower(), coding_chain),
+    (lambda x: "billing" in x["intent"].lower(), billing_chain),
+    general_chain  # default fallback
+)
+
+full_routed_chain = (
+    RunnableParallel({"intent": intent_classifier, "query": lambda x: x["query"]})
+    | router
+)""", language="python")
+
+# ---------------------------------------------------------
+# MODULE 5: ADVANCED RETRIEVAL (HYBRID, RRF, COMPRESSION)
+# ---------------------------------------------------------
+def render_retrieval_strategies():
+    st.title("🔍 Advanced Retrieval: Hybrid Search, Reranking & Compression")
+    st.caption("Overcoming dense embedding blind spots with BM25 sparse search, Reciprocal Rank Fusion, and Cross-Encoders")
+
+    st.markdown("""
+    <div class="card">
+        <div class="label" style="color: #10B981;">Why Pure Vector Search Fails in Enterprise</div>
+        <p style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
+            Dense embeddings excel at broad conceptual semantics, but fail miserably at exact keyword lookups (e.g. error code <code>ERR_503_TOKEN_EXPIRED</code>, SKU numbers, or person names). 
+            Production systems combine <strong>BM25 Sparse Keyword Search</strong> + <strong>Dense Vector Search</strong> merged via <strong>Reciprocal Rank Fusion (RRF)</strong>.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Interactive RRF Score Demo
+    st.markdown("### 🧮 Interactive Reciprocal Rank Fusion (RRF) Calculator")
+    st.caption("Formula: Score(d) = Σ [ 1 / (k + rank_i(d)) ] where k is smoothing constant (typically k=60)")
+
+    col_r1, col_r2 = st.columns([5, 7])
+    with col_r1:
+        rrf_k = st.slider("Smoothing Constant (k):", 1, 100, 60)
+        st.markdown("**Simulated Document Ranks:**")
+        doc_names = ["Doc A (Exact Error Match)", "Doc B (Broad Conceptual Match)", "Doc C (Old Release Notes)", "Doc D (API Reference)"]
+        dense_ranks = [4, 1, 6, 2]
+        bm25_ranks = [1, 5, 2, 8]
+
+        rrf_scores = []
+        for i in range(len(doc_names)):
+            score = (1.0 / (rrf_k + dense_ranks[i])) + (1.0 / (rrf_k + bm25_ranks[i]))
+            rrf_scores.append(score)
+
+        df_rrf = pd.DataFrame({
+            "Document": doc_names,
+            "Dense Rank": dense_ranks,
+            "BM25 Rank": bm25_ranks,
+            "Combined RRF Score": [round(s, 5) for s in rrf_scores]
+        }).sort_values(by="Combined RRF Score", ascending=False)
+        st.dataframe(df_rrf, use_container_width=True)
+
+    with col_r2:
+        fig_rrf = px.bar(
+            df_rrf,
+            x="Document",
+            y="Combined RRF Score",
+            color="Combined RRF Score",
+            color_continuous_scale="Viridis",
+            title="Merged Hybrid RRF Ranking"
+        )
+        fig_rrf.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=TEXT_LIGHT))
+        st.plotly_chart(fig_rrf, use_container_width=True)
+
+    st.markdown("---")
+    st.markdown("### 🛠️ Production Ensemble Retriever Code in LangChain")
+    st.code("""from langchain.retrievers import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
+from langchain_pinecone import PineconeVectorStore
+
+# 1. Sparse keyword retriever (BM25)
+bm25_retriever = BM25Retriever.from_documents(docs)
+bm25_retriever.k = 5
+
+# 2. Dense semantic retriever
+dense_retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+
+# 3. Hybrid Ensemble with Reciprocal Rank Fusion
+# 50% weight to BM25 keyword matching, 50% weight to dense semantic vector
+ensemble_retriever = EnsembleRetriever(
+    retrievers=[bm25_retriever, dense_retriever],
+    weights=[0.5, 0.5]
+)
+
+# Returns documents that score well across both lexical and vector dimensions
+hybrid_docs = ensemble_retriever.invoke("Exception ERR_401 invalid bearer token in OAuth flow")""", language="python")
+
+# ---------------------------------------------------------
+# MODULE 6: AGENTIC WORKFLOWS & LANGGRAPH STATE MACHINES
+# ---------------------------------------------------------
+def render_langgraph_agents():
+    st.title("🤖 Agentic Systems & LangGraph State Machines")
+    st.caption("Designing resilient multi-agent cyclic graphs with persistent state, tool calling, and human-in-the-loop approvals")
+
+    st.markdown("""
+    <div class="card">
+        <div class="label" style="color: #8B5CF6;">From Linear Chains to Stateful Cyclic Graphs</div>
+        <p style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
+            Traditional LangChain agents used rigid single-while-loops (ReAct). 
+            <strong>LangGraph</strong> generalizes this by modeling agent architectures as <strong>StateGraphs</strong> with typed state, conditional edges, 
+            resumable checkpoints, and multi-agent debate/critique loops.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col_g1, col_g2 = st.columns([6, 6])
+    
+    with col_g1:
+        st.markdown("#### LangGraph Multi-Agent Architecture Pattern")
+        st.code("""from typing import TypedDict, Annotated, Sequence
+import operator
+from langchain_core.messages import BaseMessage
+from langgraph.graph import StateGraph, END
+from langgraph.prebuilt import ToolNode
+
+# 1. Define Typed Agent State
+class AgentState(TypedDict):
+    messages: Annotated[Sequence[BaseMessage], operator.add]
+    research_summary: str
+    iterations: int
+
+# 2. Define State Machine Graph
+workflow = StateGraph(AgentState)
+
+# 3. Add Processing Nodes
+workflow.add_node("agent", call_reasoning_model)
+workflow.add_node("tools", ToolNode(tools=[web_search, sql_query]))
+workflow.add_node("reflection", critique_response_quality)
+
+# 4. Define Conditional Edges
+def route_next_step(state: AgentState):
+    if state["iterations"] > 5:
+        return "end"
+    last_msg = state["messages"][-1]
+    if last_msg.tool_calls:
+        return "tools"
+    return "reflection"
+
+workflow.set_entry_point("agent")
+workflow.add_conditional_edges("agent", route_next_step, {
+    "tools": "tools",
+    "reflection": "reflection",
+    "end": END
+})
+workflow.add_edge("tools", "agent")
+workflow.add_edge("reflection", END)
+
+# 5. Compile with durable memory checkpointer
+from langgraph.checkpoint.memory import MemorySaver
+app = workflow.compile(checkpointer=MemorySaver())""", language="python")
+
+    with col_g2:
+        st.markdown("#### Core LangGraph Concepts vs Legacy Agents")
+        concepts = [
+            ("StateGraph", "A directed graph where every node accepts the current state and returns state updates governed by schema reducers."),
+            ("Checkpointer (Time Travel)", "Persists state snapshots after each node step (in Redis/Postgres), enabling rollback, inspection, and human approval before actions."),
+            ("ToolNode", "Prebuilt node that executes tool calls generated by LLMs with automatic error recovery and schema verification."),
+            ("Sub-Graphs & Multi-Agent", "Hierarchical graphs where a Supervisor Agent coordinates specialist worker sub-graphs (e.g. Researcher, Coder, Reviewer)."),
+            ("Human-in-the-Loop", "Pauses execution before sensitive nodes (e.g. executing SQL write or email dispatch) until human confirmation is supplied.")
+        ]
+        for name, desc in concepts:
+            st.markdown(f"""
+            <div style="background: {BG_CARD}; border: 1px solid {BORDER_DARK}; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px;">
+                <div style="font-weight: 700; font-size: 12px; color: {AI_PURPLE};">{name}</div>
+                <div style="font-size: 11px; color: {TEXT_MUTED}; margin-top: 2px;">{desc}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# MODULE 7: EVALUATION & OBSERVABILITY (RAGAS & GUARDRAILS)
+# ---------------------------------------------------------
+def render_evaluation_observability():
+    st.title("🛡️ Production AI Observability & Ragas Evaluation")
+    st.caption("Quantifying RAG quality with the RAG Triad, automated LLM-as-a-judge scoring, and schema guardrails")
+
+    st.markdown("""
+    <div class="card">
+        <div class="label" style="color: #EC4899;">The RAG Evaluation Triad</div>
+        <p style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
+            You cannot improve what you cannot measure. Production AI systems monitor three fundamental pillars:
+            <strong>Context Relevance</strong> (did retriever fetch noise?), <strong>Faithfulness / Groundedness</strong> (did LLM hallucinate beyond context?), 
+            and <strong>Answer Relevance</strong> (did response actually address the question?).
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col_e1, col_e2, col_e3 = st.columns(3)
+    with col_e1:
+        st.markdown("""
+        <div class="card">
+            <div class="label" style="color: #60A5FA;">1. Context Precision / Recall</div>
+            <div style="font-size: 20px; font-weight: 700; color: #38BDF8; margin: 4px 0;">Retriever Quality</div>
+            <p style="font-size: 11px; color: #94A3B8;">Measures whether all relevant chunks were fetched with high signal-to-noise ratio in top-k.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_e2:
+        st.markdown("""
+        <div class="card">
+            <div class="label" style="color: #10B981;">2. Faithfulness (Groundedness)</div>
+            <div style="font-size: 20px; font-weight: 700; color: #34D399; margin: 4px 0;">Zero Hallucinations</div>
+            <p style="font-size: 11px; color: #94A3B8;">Measures if claims in the answer can be mathematically derived from the retrieved context alone.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_e3:
+        st.markdown("""
+        <div class="card">
+            <div class="label" style="color: #F59E0B;">3. Answer Relevance</div>
+            <div style="font-size: 20px; font-weight: 700; color: #FBBF24; margin: 4px 0;">User Satisfaction</div>
+            <p style="font-size: 11px; color: #94A3B8;">Measures if the generated answer directly addresses the prompt without evasive verbosity.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("### 📊 Automated Ragas Evaluation Script")
+    st.code("""from datasets import Dataset
+from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
+
+# Prepare benchmark evaluation dataset
+eval_data = {
+    "question": ["How does HNSW indexing work in vector databases?"],
+    "contexts": [["HNSW builds multi-layer graphs where top layers have longer skip links..."]],
+    "answer": ["HNSW constructs a hierarchical graph structure for sub-millisecond nearest neighbor search."],
+    "ground_truth": ["HNSW uses a multi-layer graph skip-list structure for fast approximate nearest neighbor retrieval."]
+}
+dataset = Dataset.from_dict(eval_data)
+
+# Run automated LLM-as-a-judge evaluation
+results = evaluate(
+    dataset=dataset,
+    metrics=[faithfulness, answer_relevancy, context_precision, context_recall]
+)
+
+print(results.to_pandas())""", language="python")
+
+# ---------------------------------------------------------
+# MODULE 8: AI ENGINEERING READINESS CHECKLIST
+# ---------------------------------------------------------
+def render_competency_checklist():
+    st.title("📐 AI Systems Engineering Competencies & Readiness")
+    st.caption("Self-assessment checklist for Senior AI Engineer & Staff AI Systems Architect roles")
+
+    total_tasks = len(st.session_state.ai_readiness_checklist)
+    done_tasks = sum(1 for v in st.session_state.ai_readiness_checklist.values() if v)
+    readiness_pct = int((done_tasks / total_tasks) * 100) if total_tasks else 0
+
+    col_bar1, col_bar2 = st.columns([8, 4])
+    with col_bar1:
+        st.markdown(f"**Overall Architectural Mastery: {readiness_pct}% ({done_tasks}/{total_tasks} competencies mastered)**")
+        st.progress(readiness_pct / 100)
+    with col_bar2:
+        if st.button("Reset / Check All"):
+            all_true = not all(st.session_state.ai_readiness_checklist.values())
+            for k in st.session_state.ai_readiness_checklist:
+                st.session_state.ai_readiness_checklist[k] = all_true
+            st.rerun()
+
+    st.markdown("---")
+    cols = st.columns(2)
+    items = list(st.session_state.ai_readiness_checklist.items())
+    
+    for idx, (task, state) in enumerate(items):
+        with cols[idx % 2]:
+            new_val = st.checkbox(task, value=state, key=f"chk_{idx}")
+            if new_val != state:
+                st.session_state.ai_readiness_checklist[task] = new_val
+                st.rerun()
+
+# ---------------------------------------------------------
+# MODULE 9: AI SYSTEMS RESEARCH RADAR (SEARCH GROUNDED)
+# ---------------------------------------------------------
+def render_tech_radar():
+    st.title("📡 AI Systems Research Radar & Real-Time Grounding")
+    st.caption("Live Google Search grounded research on LangChain, Vector DBs, LLM Serving & Distributed AI Systems")
+
+    st.markdown("""
+    <div class="card">
+        <div class="label" style="color: #60A5FA;">Google Search Grounded Architectural Intelligence</div>
+        <p style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
+            Query cutting-edge developments across official LangChain docs, vector store whitepapers, and production LLM scaling papers.
+            Or click the <strong>AI Tech Radar</strong> button in the top right to open the sliding search drawer anytime!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    radar_query = st.text_input(
+        "Enter AI Engineering Query:",
+        value="LangGraph StateGraph multi-agent workflow human in the loop"
+    )
+
+    if st.button("🔍 Search AI Knowledge Base", type="primary"):
+        with st.spinner("Querying Google Search Grounding & Synthesizing Architectural Analysis..."):
             try:
+                import urllib.request
                 import urllib.parse
-                import json
-                encoded_q = urllib.parse.quote(query_input.strip())
                 
-                # Fetch through Pyodide open_url or standard urllib
-                try:
-                    from pyodide.http import open_url
-                    res = open_url(f"/api/search?q={encoded_q}")
-                    payload = json.loads(res.read())
-                except Exception:
-                    import urllib.request
-                    with urllib.request.urlopen(f"http://localhost:3000/api/search?q={encoded_q}", timeout=30) as resp:
-                        payload = json.loads(resp.read().decode('utf-8'))
-
-                if "error" in payload:
-                    st.error(f"Search Error: {payload['error']}")
-                else:
-                    st.markdown("#### Grounded Architecture Brief")
-                    st.markdown(payload.get("content", ""))
+                url = f"http://localhost:3000/api/search?q={urllib.parse.quote(radar_query)}"
+                req = urllib.request.Request(url, headers={'User-Agent': 'Pyodide-Client'})
+                with urllib.request.urlopen(req, timeout=30) as response:
+                    res_body = response.read().decode('utf-8')
+                    payload = json.loads(res_body)
+                    
+                    st.markdown("### 📄 Grounded Architectural Synthesis")
+                    st.markdown(payload.get("content", "No synthesis returned."))
                     
                     sources = payload.get("sources", [])
                     if sources:
                         st.markdown("---")
-                        st.markdown("**🔗 Verified Grounded Sources & Publications:**")
+                        st.markdown("**🔗 Verified Sources & Reference Documentation:**")
                         source_cols = st.columns(min(len(sources), 3))
                         for idx, src in enumerate(sources):
                             with source_cols[idx % 3]:
                                 st.markdown(f"- [{src.get('title', 'Source')}]({src.get('uri', '#')})")
 
             except Exception as e:
-                st.warning(f"Note: Connected through local backend. For quick search with real-time sliding panel, click the 'Meta Tech Radar' button in the top right corner. (Error: {e})")
-
-    st.markdown("---")
-    st.markdown("### 📚 Meta Engineering Landmark Papers & Systems Guide")
-    st.caption("Essential systems referenced in Meta DE Case Study & System Design rounds")
-
-    tech_items = [
-        {
-            "name": "Velox: Unified Execution Engine",
-            "year": "2022-Present",
-            "category": "Query Engine & Vectorization",
-            "summary": "Meta's open-source C++ database acceleration library. Eliminates redundant query engines by providing a single vectorized execution runtime for Presto, Apache Spark, and PyTorch dataloaders.",
-            "link": "https://engineering.fb.com/2023/03/09/open-source/velox-open-source-execution-engine/",
-            "interview_tip": "Highlight how vectorized execution (SIMD) and column-batch processing in C++ bypass JVM garbage collection and JIT overhead at exabyte scale."
-        },
-        {
-            "name": "Apache Iceberg at Meta Scale",
-            "year": "2023-Present",
-            "category": "Data Lakehouse & Table Formats",
-            "summary": "Meta's migration from legacy Hive metastore partition directories to Apache Iceberg metadata tree structures, enabling ACID transactions, atomic partition swaps, and hidden partitioning.",
-            "link": "https://engineering.fb.com/2024/01/23/data-infrastructure/apache-iceberg-meta/",
-            "interview_tip": "Discuss how Iceberg eliminates the O(N) filesystem list directory bottleneck during query planning by tracking files directly in snapshot metadata manifests."
-        },
-        {
-            "name": "Apache Flink Real-Time Streaming",
-            "year": "Core Infrastructure",
-            "category": "Stream Processing",
-            "summary": "Powers Instagram Reels real-time ranking, recommendation signal extraction, and ad attribution with sub-second SLA and RocksDB state backend.",
-            "link": "https://engineering.fb.com/2021/04/12/developer-tools/real-time-analytics/",
-            "interview_tip": "Explain watermarking, exactly-once processing with two-phase commit sinks, and managing large RocksDB state checkpoints."
-        },
-        {
-            "name": "Scuba & Gorilla Telemetry",
-            "year": "Landmark Systems",
-            "category": "Real-Time In-Memory Analytics",
-            "summary": "Scuba provides real-time distributed log analytics (<1 second response on billions of events), while Gorilla provides high-density in-memory time-series storage with XOR double-delta floating point compression.",
-            "link": "https://engineering.fb.com/2015/08/27/core-infra/gorilla-a-fast-scalable-in-memory-time-series-database/",
-            "interview_tip": "Use Gorilla as an example of domain-specific lossless compression: timestamps compress by 96% and float values by 73% using XOR delta encoding."
-        },
-        {
-            "name": "FAISS & DLRM AI Infrastructure",
-            "year": "AI / Recommendations",
-            "category": "Vector Similarity & Ranking",
-            "summary": "FAISS (Facebook AI Similarity Search) enables billion-scale approximate nearest neighbor (ANN) retrieval for dense embeddings, feeding candidate sets into Deep Learning Recommendation Models.",
-            "link": "https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/",
-            "interview_tip": "Clarify the two-stage recommendation pipeline: Stage 1 (FAISS Candidate Generation: millions to thousands) and Stage 2 (DLRM Heavy Ranking: thousands to top 10 items)."
-        },
-        {
-            "name": "Data Quality Circuit Breakers",
-            "year": "Pipeline Reliability",
-            "category": "Governance & Integrity",
-            "summary": "Automated data verification gates embedded between staging partitions and production tables. Detects null spikes, duplicate keys, and volume anomalies, preventing corrupt data from polluting downstream dashboards.",
-            "link": "https://engineering.fb.com",
-            "interview_tip": "Stress the importance of automated circuit breakers: it is always better to delay an SLA by 30 minutes than to publish corrupted financial or metric data."
-        }
-    ]
-
-    for item in tech_items:
-        with st.expander(f"🔹 {item['name']} ({item['category']} • {item['year']})"):
-            st.markdown(f"**Architecture Summary:** {item['summary']}")
-            st.markdown(f"**🎯 Interview Talking Point:** {item['interview_tip']}")
-            st.markdown(f"🔗 [Read Official Meta Engineering Post]({item['link']})")
+                st.info("Tip: Click the 'AI Tech Radar' button in the top right header for instant sliding research drawer with real-time web search grounding.")
 
 # ---------------------------------------------------------
 # MAIN NAVIGATION ROUTER
 # ---------------------------------------------------------
 pages = {
-    "Overview & Dashboard": render_dashboard,
-    "Module 1: Product Sense & Metrics": render_module_1,
-    "Module 2: Data Modeling & Schema Design": render_module_2,
-    "Module 3: SQL Engine & Optimization": render_module_3,
-    "Module 4: Python Scripting": render_module_4,
-    "Module 5: Big Data Pipelines": render_module_5,
-    "Module 6: AI Infrastructure": render_module_6,
-    "Module 7: Data Visualization": render_module_7,
-    "Module 8: Behavioral (Meta Values)": render_module_8,
-    "Module 9: 4-Week Roadmap": render_module_9,
-    "Module 10: Meta Tech Radar & Blogs": render_module_10
+    "🏠 Overview & Blueprint Dashboard": render_dashboard,
+    "🔁 1. RAG Sequence Diagram (Interactive)": render_rag_sequence,
+    "💰 2. Scaling Cost & Token Calculator": render_cost_calculator,
+    "🗄️ 3. Vector DB Configurator & Trade-offs": render_vector_db_configurator,
+    "🦜 4. LangChain LCEL & Runnables": render_lcel_deep_dive,
+    "🔍 5. Hybrid Search & Reranking": render_retrieval_strategies,
+    "🤖 6. LangGraph & Multi-Agent Systems": render_langgraph_agents,
+    "🛡️ 7. AI Observability & Ragas Eval": render_evaluation_observability,
+    "📐 8. Competencies & Readiness Checklist": render_competency_checklist,
+    "📡 9. AI Systems Research Radar": render_tech_radar
 }
 
+# Sidebar Branding & Navigation
 st.sidebar.markdown(f"""
 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 4px;">
-    <div style="width: 28px; height: 28px; background: {META_BLUE}; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white;">M</div>
+    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, {AI_BLUE}, {AI_PURPLE}); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);">🦜</div>
     <div>
-        <div style="font-weight: 700; font-size: 13px; color: #FFFFFF; letter-spacing: -0.02em;">META DE BLUEPRINT</div>
-        <div style="font-size: 10px; color: {TEXT_MUTED}; text-transform: uppercase;">L4/L5 Interview Guide</div>
+        <div style="font-weight: 700; font-size: 13px; color: #FFFFFF; letter-spacing: -0.02em;">LANGCHAIN & AI SYSTEMS</div>
+        <div style="font-size: 10px; color: {TEXT_MUTED}; text-transform: uppercase;">Production Engineering Guide</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-selection = st.sidebar.radio("Preparation Modules:", list(pages.keys()))
+selection = st.sidebar.radio("Architecture Modules:", list(pages.keys()))
 
 st.sidebar.markdown("---")
-total_t = len(st.session_state.checklist_state)
-done_t = sum(1 for v in st.session_state.checklist_state.values() if v)
+total_t = len(st.session_state.ai_readiness_checklist)
+done_t = sum(1 for v in st.session_state.ai_readiness_checklist.values() if v)
 readiness = int((done_t / total_t) * 100) if total_t else 0
 
 st.sidebar.markdown(f"""
 <div style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
     <span class="label">Candidate Readiness</span>
-    <span style="font-size: 11px; font-weight: 700; color: {META_BLUE}; font-family: monospace;">{readiness}%</span>
+    <span style="font-size: 11px; font-weight: 700; color: {AI_BLUE}; font-family: monospace;">{readiness}%</span>
 </div>
 """, unsafe_allow_html=True)
 st.sidebar.progress(readiness / 100)
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(f"""
-<div style="background: #162032; border: 1px solid #334155; border-radius: 6px; padding: 10px; margin-bottom: 12px;">
-    <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #60A5FA; letter-spacing: 0.05em; margin-bottom: 4px;">📡 Meta Tech Radar</div>
-    <div style="font-size: 11px; color: #94A3B8; margin-bottom: 8px;">Semantic Google Search Grounding for current DE trends & Meta engineering blogs.</div>
-    <button onclick="if(window.parent && window.parent.toggleSearchSidebar){window.parent.toggleSearchSidebar(true)}else if(window.toggleSearchSidebar){window.toggleSearchSidebar(true)}" style="width: 100%; background: {META_BLUE}; color: white; border: none; border-radius: 4px; padding: 6px 10px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; cursor: pointer;">Open Radar Search 🔍</button>
+<div style="background: #162032; border: 1px solid #2D3A4F; border-radius: 6px; padding: 10px; margin-bottom: 12px;">
+    <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #60A5FA; letter-spacing: 0.05em; margin-bottom: 4px;">📡 AI Tech Radar</div>
+    <div style="font-size: 11px; color: #94A3B8; margin-bottom: 8px;">Semantic Google Search Grounding for modern LangChain & AI system breakthroughs.</div>
+    <button onclick="if(window.parent && window.parent.toggleSearchSidebar){{window.parent.toggleSearchSidebar(true)}}else if(window.toggleSearchSidebar){{window.toggleSearchSidebar(true)}}" style="width: 100%; background: linear-gradient(135deg, {AI_BLUE}, {AI_PURPLE}); color: white; border: none; border-radius: 4px; padding: 6px 10px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; cursor: pointer;">Open Radar Search 🔍</button>
 </div>
 """, unsafe_allow_html=True)
 
-st.sidebar.caption("Designed for Meta DE candidates • Powered by Pyodide, Express & Gemini 3.8")
+st.sidebar.caption("Designed for AI Engineers & LLM Architects • Powered by Pyodide, Express & Gemini 3.8")
 
-# Route to chosen page
+# Execute page function
 pages[selection]()
-

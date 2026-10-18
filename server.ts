@@ -25,8 +25,7 @@ const ai = new GoogleGenAI({
   },
 });
 
-// API endpoint for Google Search grounded semantic search on Meta Engineering & DE Trends
-// Shared search execution function with Google Search grounding
+// API endpoint for Google Search grounded semantic search on LangChain & AI Systems Architecture
 async function executeGroundedSearch(query: string, res: Response) {
   try {
     if (!query || typeof query !== 'string' || !query.trim()) {
@@ -41,29 +40,32 @@ async function executeGroundedSearch(query: string, res: Response) {
     }
 
     const searchPrompt = `
-You are a senior Meta Data Engineering Staff Architect and research assistant.
-The candidate is preparing for Meta Data Engineer interviews (L4/L5/L6) and searching for current industry developments, architectures, and Meta engineering blog posts.
+You are a Principal AI Systems Architect and LangChain / LLM infrastructure specialist.
+The engineer is designing or optimizing production AI systems, RAG pipelines, or multi-agent workflows using LangChain, LangGraph, and modern vector stores.
 
 User Query: "${query.trim()}"
 
 Search Google focusing on:
-1. Meta Engineering Blog (engineering.fb.com)
-2. Meta open-source data systems (Velox, Presto/Trino, RocksDB, FAISS, PyTorch/DLRM, Delos, Gorilla, Scuba, LogDevice)
-3. Cutting-edge distributed data engineering trends (Lakehouse, Apache Iceberg, Flink streaming, Data Quality Circuit Breakers)
+1. Official LangChain & LangGraph documentation and architecture design patterns (python.langchain.com, langchain-ai.github.io/langgraph)
+2. Vector database engineering benchmarks & scaling trade-offs (Pinecone, Chroma, FAISS, Qdrant, Milvus, pgvector)
+3. Production RAG pipelines: query transformation (HyDE), hybrid retrieval (BM25 + Dense), Cross-Encoder reranking, and context compression
+4. LLM inference cost optimization: prompt caching, semantic caching (Redis), quantization, and vLLM token economics
+5. Production AI evaluation frameworks (Ragas, TruLens, LangSmith tracing)
 
-Please structure your response in clean Markdown with:
+Please structure your response in clean, technical Markdown:
 ### 📌 Executive Architectural Summary
-Brief 2-3 sentence overview of what problem Meta/modern DE solves here and the high-level architecture.
+Brief 2-3 sentence overview of what problem this pattern solves and the high-level architecture.
 
-### ⚙️ Core Technical Stack & Deep-Dive
-- Specific technologies, query engines, storage formats, and distributed algorithms used at Meta scale.
-- Trade-offs considered (e.g. latency vs. throughput, cost vs. freshness, shuffle vs. broadcast).
+### ⚙️ Core Technical Stack & Implementation Deep-Dive
+- Precise components, LangChain/LangGraph classes, vector index configurations, and algorithms.
+- Concrete Python snippet or LCEL composition pattern where applicable.
+- Latency and throughput trade-offs (e.g. TTFT, P95 retrieval latency, token overhead).
 
-### 🎯 Meta DE Interview Takeaways
-- How this topic is tested in Meta technical screens, data modeling cases, or system design interviews.
-- 2-3 specific talking points or pitfall warnings to impress interviewers.
+### 🎯 Production Engineering Takeaways & Pitfalls
+- Critical production failure modes (e.g. lost-in-the-middle context degradation, embedding drift, state serialization bugs).
+- 2-3 actionable best practices for scaling from prototype to production.
 
-Be accurate, highly technical, and up to date with the latest Meta engineering publications.
+Be precise, highly technical, and completely up to date with modern LangChain and AI system engineering standards.
 `;
 
     const response = await ai.models.generateContent({
@@ -105,114 +107,137 @@ Be accurate, highly technical, and up to date with the latest Meta engineering p
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
-    console.warn('Search grounding encountered error, generating curated Meta architectural brief:', error.message || error);
+    console.warn('Search grounding encountered error, generating curated AI systems architectural brief:', error.message || error);
     
-    // Provide comprehensive architectural brief and verified Meta engineering links
+    // Provide comprehensive architectural brief and verified references
     const qLower = query.toLowerCase();
     let brief = "";
     let fallbackSources: { title: string; uri: string }[] = [];
 
-    if (qLower.includes("velox") || qLower.includes("presto") || qLower.includes("query") || qLower.includes("engine")) {
+    if (qLower.includes("lcel") || qLower.includes("runnable") || qLower.includes("pipe") || qLower.includes("chain")) {
       brief = `### 📌 Executive Architectural Summary
-**Meta Velox** is an open-source, vectorized C++ database acceleration library developed by Meta to eliminate duplicated query execution runtime logic. Historically, Meta maintained separate execution runtimes for Presto (Trino), Apache Spark, and PyTorch dataloading. Velox unifies these disparate computation engines onto a single high-performance C++ execution core.
+**LangChain Expression Language (LCEL)** is a declarative orchestration protocol designed to compose arbitrary Runnables into unified pipelines. LCEL replaces legacy imperative chains by enforcing the \`Runnable\` interface (\`invoke\`, \`batch\`, \`stream\`, \`ainvoke\`, \`astream_log\`), providing out-of-the-box streaming, async execution, parallel branch routing, and automatic fallback handling.
 
-### ⚙️ Core Technical Stack & Deep-Dive
-- **Vectorized SIMD Processing:** Operates on contiguous columnar memory vectors (Apache Arrow-like format) rather than row-at-a-time iterator models (Volcano), maximizing L1/L2 CPU cache residency and leveraging SIMD instructions.
-- **Bypassing JVM Overhead:** By migrating compute-intensive operators (joins, aggregations, window functions) from Java to C++, Velox completely eliminates JVM Garbage Collection pauses, JIT warmup latency, and object boxing overhead at petabyte scale.
-- **Pluggable Integration:** Presto on Velox (Presto Native) and Spark on Velox (Gluten) replace Java query worker runtimes while preserving existing query planners and API surfaces.
+### ⚙️ Core Technical Stack & Implementation Deep-Dive
+- **The Runnable Protocol:** Every LCEL component implements \`Runnable[Input, Output]\`. Chaining with the Unix pipe operator \`|\` creates a \`RunnableSequence\`:
+  \`\`\`python
+  from langchain_core.prompts import ChatPromptTemplate
+  from langchain_core.output_parsers import StrOutputParser
+  from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+  
+  chain = (
+      RunnableParallel({"context": retriever, "question": RunnablePassthrough()})
+      | prompt_template
+      | model
+      | StrOutputParser()
+  )
+  \`\`\`
+- **Streaming & Async Concurrency:** LCEL stream-yields token chunks with zero overhead, enabling Time-to-First-Token (TTFT) under 350ms while parallelizing retrieval and memory lookup.
+- **Failover & Fallbacks:** \`primary_model.with_fallbacks([secondary_model])\` provides sub-second disaster recovery against API rate limits.
 
-### 🎯 Meta DE Interview Takeaways
-- **Key Talking Point:** In System Design or Optimization interviews, contrast row-based execution vs. columnar vectorization. Explain how C++ vectorization achieves 2x–3x compute efficiency gains on identical hardware.
-- **Trade-off:** C++ native engines require stricter memory isolation (arena allocators) compared to garbage-collected runtimes, making memory leak detection and core dump management critical.`;
+### 🎯 Production Engineering Takeaways & Pitfalls
+- **Streaming Decoupling:** Always use \`astream\` or \`astream_events\` when powering user-facing web applications; synchronous \`invoke\` blocks the Node/Python event loop.
+- **Schema Validation:** Pair LCEL chains with \`PydanticOutputParser\` or \`.with_structured_output(Schema)\` to eliminate parsing hallucination failures.`;
       fallbackSources = [
-        { title: "Meta Engineering: Velox Open Source Execution Engine", uri: "https://engineering.fb.com/2023/03/09/open-source/velox-open-source-execution-engine/" },
-        { title: "Velox Project Documentation", uri: "https://velox-lib.io/" },
-        { title: "Presto Native with Velox", uri: "https://prestodb.io/blog/2023/04/17/prestissimo" }
+        { title: "LangChain Documentation: Expression Language (LCEL)", uri: "https://python.langchain.com/docs/concepts/lcel/" },
+        { title: "LangChain Runnable Interface Specification", uri: "https://python.langchain.com/docs/concepts/runnables/" },
+        { title: "Streaming with LangChain Runnables", uri: "https://python.langchain.com/docs/how_to/streaming/" }
       ];
-    } else if (qLower.includes("iceberg") || qLower.includes("lake") || qLower.includes("table") || qLower.includes("format")) {
+    } else if (qLower.includes("langgraph") || qLower.includes("agent") || qLower.includes("state") || qLower.includes("multi-agent")) {
       brief = `### 📌 Executive Architectural Summary
-Meta transitioned its core data lakehouse infrastructure from legacy Hive Metastore partition directories to **Apache Iceberg**. At Meta's exabyte scale, directory-based partitioning caused catastrophic metadata bottlenecks when querying tables containing millions of partition directories and billions of files.
+**LangGraph** is a stateful orchestration framework built on top of LangChain that models agentic workflows as directed cyclic graphs. Unlike linear LCEL chains or legacy ReAct single-loop agents, LangGraph introduces persistent state management, multi-agent coordination, cyclic reflection loops, and human-in-the-loop inspection.
 
-### ⚙️ Core Technical Stack & Deep-Dive
-- **Metadata Tree Hierarchy:** Iceberg replaces directory listing with hierarchical metadata files: *Iceberg Catalog -> Metadata JSON File -> Manifest List -> Manifest Files -> Parquet Data Files*.
-- **O(1) Snapshot Isolation:** Enables true ACID transactions and atomic partition swaps without physical file moves or HDFS namenode/S3 directory listing calls.
-- **Hidden Partitioning:** Users query by standard timestamp columns (e.g. \`event_timestamp >= '2024-05-01'\`), and Iceberg automatically derives partition pruning on the underlying day partition without requiring explicit \`ds\` partition filters.
+### ⚙️ Core Technical Stack & Implementation Deep-Dive
+- **StateGraph Architecture:** Defined by a typed state dictionary (e.g., TypedDict with reducer annotations):
+  \`\`\`python
+  from langgraph.graph import StateGraph, END
+  from typing import TypedDict, Annotated
+  import operator
 
-### 🎯 Meta DE Interview Takeaways
-- **Key Talking Point:** When asked about scaling data lakes, explain how Iceberg snapshot isolation enables concurrent writers without dirty reads and solves the "small files problem" via background metadata compaction.
-- **Data Modeling Tip:** Highlight schema evolution in Iceberg: columns can be added, renamed, or reordered by unique ID without rewriting underlying Parquet files.`;
+  class AgentState(TypedDict):
+      messages: Annotated[list, operator.add]
+      next_step: str
+      tool_outputs: dict
+
+  workflow = StateGraph(AgentState)
+  workflow.add_node("agent", call_model)
+  workflow.add_node("action", call_tool)
+  workflow.add_conditional_edges("agent", should_continue, {"continue": "action", "end": END})
+  workflow.set_entry_point("agent")
+  app = workflow.compile(checkpointer=MemorySaver())
+  \`\`\`
+- **Checkpointing & Time-Travel:** LangGraph saves snapshot states after every node execution into durable stores (Postgres, Redis), enabling rewinding, state modification, and human-in-the-loop approvals.
+
+### 🎯 Production Engineering Takeaways & Pitfalls
+- **Avoid Infinite ReAct Loops:** Always configure hard \`recursion_limit\` safeguards (e.g., 25 steps) to prevent runaway token spend on complex tool failures.
+- **State Reducer Discipline:** Use explicit state reducers (\`operator.add\`) for message histories to prevent accidental state overwrite.`;
       fallbackSources = [
-        { title: "Meta Engineering: Apache Iceberg at Meta Scale", uri: "https://engineering.fb.com/2024/01/23/data-infrastructure/apache-iceberg-meta/" },
-        { title: "Apache Iceberg Architecture Specification", uri: "https://iceberg.apache.org/" },
-        { title: "Meta Engineering: Scaling the Data Warehouse", uri: "https://engineering.fb.com" }
+        { title: "LangGraph Official Documentation", uri: "https://langchain-ai.github.io/langgraph/" },
+        { title: "LangChain Multi-Agent Architectures", uri: "https://python.langchain.com/docs/tutorials/agents/" },
+        { title: "Human-in-the-Loop Agent Workflows with LangGraph", uri: "https://langchain-ai.github.io/langgraph/how-tos/human-in-the-loop/" }
       ];
-    } else if (qLower.includes("flink") || qLower.includes("stream") || qLower.includes("real-time") || qLower.includes("reels")) {
+    } else if (qLower.includes("vector") || qLower.includes("pinecone") || qLower.includes("faiss") || qLower.includes("chroma") || qLower.includes("qdrant")) {
       brief = `### 📌 Executive Architectural Summary
-Meta utilizes **Apache Flink** as the backbone of its real-time stream processing platform. It powers sub-second telemetry aggregation for Instagram Reels, real-time engagement features for feed ranking, and automated fraud/abuse detection.
+Vector databases provide the indexing and approximate nearest neighbor (ANN) retrieval backbone for production RAG pipelines. Selecting between managed cloud engines (**Pinecone**), embedded prototypes (**Chroma**), in-memory GPU libraries (**FAISS**), or specialized distributed engines (**Qdrant**, **Milvus**, **pgvector**) dictates your system's p95 query latency, recall rate, and operational overhead.
 
-### ⚙️ Core Technical Stack & Deep-Dive
-- **Stateful Processing with RocksDB:** Flink workers store gigabytes of localized state per operator in embedded RocksDB key-value stores on local NVMe SSDs, periodically checkpointing snapshots to durable distributed object storage.
-- **Event-Time Watermarking:** Handles out-of-order and delayed mobile telemetry events across flaky mobile networks by decoupling processing wall-clock time from event-generation timestamps.
-- **Low-Latency Ad Attribution:** Joins high-volume click/view streams with downstream conversion events within sliding or sessionized time windows with sub-5-second end-to-end latency.
+### ⚙️ Core Technical Stack & Implementation Deep-Dive
+- **Index Algorithms:**
+  - **HNSW (Hierarchical Navigable Small World):** Multi-layer skip-list graph offering superior recall (>98%) and sub-10ms retrieval at the cost of high RAM consumption (1.5x-2x vector size).
+  - **IVFFlat / IVF-PQ (Inverted File with Product Quantization):** Partitions vector space into Voronoi cells; PQ compresses 1536-dim vectors by up to 90%, enabling billion-vector datasets in modest memory.
+- **Payload & Metadata Filtering:**
+  - *Post-filtering:* Vector search first, then filter by metadata (risks low recall if filtered items don't appear in top-K).
+  - *Pre-filtering / Single-stage filtering (Qdrant, Pinecone):* Simultaneously walks index graph while enforcing metadata constraints.
 
-### 🎯 Meta DE Interview Takeaways
-- **Key Talking Point:** Contrast Streaming (Flink) vs. Micro-batching (Spark) vs. Daily Batch. Emphasize that while streaming delivers freshness, it incurs 3x–5x higher operational complexity and compute cost.
-- **Failure Recovery:** Discuss how asynchronous barrier snapshotting (Chandy-Lamport algorithm) guarantees exactly-once state semantics upon node failure.`;
+### 🎯 Production Engineering Takeaways & Pitfalls
+- **Embedding Alignment:** Ensure the exact same embedding model (and pooling strategy: mean vs CLS) is utilized for both ingestion and inference queries.
+- **Memory Footprint Rule of Thumb:** 1M 1536-dim vectors with float32 require ~6.14 GB raw storage + ~3-5 GB HNSW graph metadata.`;
       fallbackSources = [
-        { title: "Meta Engineering: Real-Time Stream Analytics", uri: "https://engineering.fb.com/2021/04/12/developer-tools/real-time-analytics/" },
-        { title: "Apache Flink Architecture Documentation", uri: "https://flink.apache.org/" },
-        { title: "Stateful Stream Processing at Scale", uri: "https://engineering.fb.com" }
+        { title: "LangChain Vector Stores Integration Guide", uri: "https://python.langchain.com/docs/integrations/vectorstores/" },
+        { title: "ANN Benchmarks: Vector Database Comparisons", uri: "https://ann-benchmarks.com/" },
+        { title: "Pinecone vs Qdrant vs Chroma Architectural Guide", uri: "https://qdrant.tech/benchmarks/" }
       ];
-    } else if (qLower.includes("faiss") || qLower.includes("vector") || qLower.includes("embedding") || qLower.includes("ai") || qLower.includes("recommendation")) {
+    } else if (qLower.includes("cost") || qLower.includes("token") || qLower.includes("cache") || qLower.includes("scale")) {
       brief = `### 📌 Executive Architectural Summary
-**FAISS (Facebook AI Similarity Search)** is Meta's foundational vector indexing library designed for billion-scale dense vector similarity search. In recommendation systems (Instagram Explore, Reels, Marketplace), it enables sub-millisecond retrieval of candidate content embeddings.
+Production AI systems face exponential operational costs as query volume scales. A production LangChain application processing 1M queries/month can range from $250/mo to over $25,000/mo depending on prompt chunking strategy, model tier selection, and semantic cache implementation.
 
-### ⚙️ Core Technical Stack & Deep-Dive
-- **Two-Stage Recommendation Pipeline:** 
-  1. *Candidate Generation (Retrieval):* FAISS reduces billions of catalog items down to top ~1,000 candidates via approximate nearest neighbor (ANN) search using Product Quantization (IVF-PQ) and HNSW graph indexing.
-  2. *Heavy Ranking:* Deep Learning Recommendation Models (DLRM) compute full click-through-rate (CTR) and watch-time predictions on the candidate subset.
-- **Hardware Acceleration:** Highly optimized CUDA kernels enable billions of dot-product and cosine-distance calculations directly on GPU tensor cores.
+### ⚙️ Core Technical Stack & Implementation Deep-Dive
+- **Semantic Caching (Redis / GPTCache):** Instead of exact-string hash match, compares incoming query embedding similarity to cached vector keys. If cosine similarity > 0.92, returns cached completion in <15ms, eliminating 40%-70% of downstream LLM calls.
+- **Provider Prompt Caching:** Models like Gemini, Anthropic, and OpenAI support server-side prefix prompt caching, reducing repeated prompt tokens by 75%-90%.
+- **Context Compression Chaining:**
+  \`\`\`python
+  from langchain.retrievers import ContextualCompressionRetriever
+  from langchain.retrievers.document_compressors import LLMChainExtractor
+  
+  compressor = LLMChainExtractor.from_llm(small_fast_llm)
+  compression_retriever = ContextualCompressionRetriever(
+      base_compressor=compressor, base_retriever=raw_vectorstore_retriever
+  )
+  \`\`\`
 
-### 🎯 Meta DE Interview Takeaways
-- **Key Talking Point:** Differentiate offline embedding generation (batch Spark pipelines writing vectors into Lakehouse) from online real-time retrieval (FAISS indices hosted in memory).
-- **Metric Considerations:** Discuss trade-offs between recall percentage vs. query latency SLA (<15ms).`;
+### 🎯 Production Engineering Takeaways & Pitfalls
+- **Token Bleed:** Always set strict \`max_tokens\` limits on retrieved contexts; sending 10 raw 1000-token chunks inflates prompt cost by 10x without improving factual accuracy.
+- **Tiered Routing:** Route simple intent queries to lightweight models (Gemini Flash / GPT-4o-mini) and reserve flagship reasoning models for multi-hop synthesis.`;
       fallbackSources = [
-        { title: "Meta Engineering: FAISS Vector Similarity Search", uri: "https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/" },
-        { title: "FAISS GitHub Repository & Benchmarks", uri: "https://github.com/facebookresearch/faiss" },
-        { title: "Meta DLRM Architecture for Recommendations", uri: "https://engineering.fb.com" }
-      ];
-    } else if (qLower.includes("scuba") || qLower.includes("gorilla") || qLower.includes("telemetry") || qLower.includes("time series")) {
-      brief = `### 📌 Executive Architectural Summary
-Meta relies on **Scuba** (for fast multidimensional log slicing) and **Gorilla** (for high-density metrics compression). Both systems provide internal engineers with sub-second visibility into live production incidents, service health, and performance anomalies across thousands of microservices.
-
-### ⚙️ Core Technical Stack & Deep-Dive
-- **Gorilla In-Memory Time Series:** Stores tens of billions of metric data points entirely in RAM. Uses XOR double-delta floating point compression, reducing timestamp storage by 96% (from 64 bits to ~1.37 bits) and value storage by 73% (from 64 bits to ~13.7 bits).
-- **Scuba Distributed Aggregation:** Fan-out tree architecture that distributes real-time table scan queries across memory-resident leaf nodes, returning aggregated group-by queries on millions of rows in under 800ms.
-
-### 🎯 Meta DE Interview Takeaways
-- **Key Talking Point:** When designing real-time observability or anomaly detection systems, reference Gorilla's compression technique as the industry standard benchmark (now adopted in Prometheus and M3DB).
-- **Design Trade-off:** Memory retention window is intentionally bounded (e.g. 26 hours in RAM), after which data is downsampled and flushed to long-term cold storage.`;
-      fallbackSources = [
-        { title: "Meta Engineering: Gorilla In-Memory Time Series Database", uri: "https://engineering.fb.com/2015/08/27/core-infra/gorilla-a-fast-scalable-in-memory-time-series-database/" },
-        { title: "Scuba: Fast, Scalable Distributed Log Analysis", uri: "https://research.facebook.com/publications/scuba-diving-into-data-at-facebook/" },
-        { title: "Meta Engineering: Real-Time Infrastructure", uri: "https://engineering.fb.com" }
+        { title: "LangChain Caching Documentation", uri: "https://python.langchain.com/docs/how_to/llm_caching/" },
+        { title: "Redis Vector Store & Semantic Cache for LLMs", uri: "https://redis.io/solutions/semantic-cache/" },
+        { title: "Contextual Compression Retrievers in LangChain", uri: "https://python.langchain.com/docs/how_to/contextual_compression/" }
       ];
     } else {
       brief = `### 📌 Executive Architectural Summary
-Modern **Meta Data Engineering Architecture** operates across four interconnected layers designed to handle petabyte-scale ingestion, exabyte storage, and sub-second analytics: Ingestion (Scribe/Kafka) -> Stream Processing (Flink) -> Lakehouse Storage (Apache Iceberg & Parquet) -> Compute & Query Acceleration (Velox & Presto/Trino).
+Modern **Production AI Systems Architecture** built with LangChain centers on five core operational pillars: Ingestion & Chunking -> Vector Search & Hybrid Retrieval -> Contextual Reranking & Compression -> Orchestrated Inference (LCEL/LangGraph) -> Automated Evaluation (Ragas/LangSmith).
 
-### ⚙️ Core Technical Stack & Deep-Dive
-- **Storage & Metadata:** Apache Iceberg metadata snapshots replace legacy Hive metastores, enabling atomic commits and schema evolution without data restatement.
-- **Compute Unification:** Meta's C++ Velox engine provides shared vectorized acceleration across Presto and Spark workloads.
-- **Data Quality & Reliability:** Automated Circuit Breakers validate row counts, null rates, and distribution shifts before staging partitions swap into production.
+### ⚙️ Core Technical Stack & Implementation Deep-Dive
+- **Hybrid Search (Dense + Sparse):** Combines BM25 keyword matching with dense embedding vectors using Reciprocal Rank Fusion (RRF) to eliminate dense embedding blindspots for exact entity names and codes.
+- **Cross-Encoder Reranking:** Re-scores the top-50 vector candidates with a cross-encoder model (e.g. Cohere Rerank or BGE-Reranker) before injecting the top-4 into the final LLM prompt.
+- **Declarative Composition:** LCEL pipelines provide built-in streaming, asynchronous execution, and automated fallback routing across multiple providers.
 
-### 🎯 Meta DE Interview Takeaways
-- **Key Talking Point:** Focus on business trade-offs: cost vs. freshness, compute efficiency (SIMD vectorization), and partition idempotency.
-- **Interview Mindset:** Always start by clarifying data grain, volume, read/write ratios, and failure recovery protocols.`;
+### 🎯 Production Engineering Takeaways & Pitfalls
+- **Guard Against Hallucinations:** Measure context recall and groundedness with Ragas before deploying changes to prompt templates.
+- **Latency Budgeting:** Enforce p95 budgets: <30ms vector search, <50ms reranking, <400ms time-to-first-token.`;
       fallbackSources = [
-        { title: "Meta Engineering Blog: Data Infrastructure", uri: "https://engineering.fb.com/category/data-infrastructure/" },
-        { title: "Velox C++ Unified Execution Engine", uri: "https://engineering.fb.com/2023/03/09/open-source/velox-open-source-execution-engine/" },
-        { title: "Apache Iceberg at Meta Scale", uri: "https://engineering.fb.com/2024/01/23/data-infrastructure/apache-iceberg-meta/" }
+        { title: "LangChain Production Architectures Guide", uri: "https://python.langchain.com/docs/introduction/" },
+        { title: "LangGraph Multi-Agent Architecture", uri: "https://langchain-ai.github.io/langgraph/" },
+        { title: "Ragas: Automated Evaluation for RAG Pipelines", uri: "https://docs.ragas.io/" }
       ];
     }
 
@@ -232,7 +257,7 @@ app.post('/api/search', async (req: Request, res: Response) => {
   await executeGroundedSearch(query, res);
 });
 
-// GET endpoint for synchronous Pyodide open_url queries
+// GET endpoint for synchronous Pyodide queries
 app.get('/api/search', async (req: Request, res: Response) => {
   const query = (req.query.q as string) || (req.query.query as string);
   await executeGroundedSearch(query, res);
@@ -243,40 +268,40 @@ app.get('/api/trending-topics', (_req: Request, res: Response) => {
   res.json({
     topics: [
       {
-        title: "Velox C++ Execution Engine",
-        query: "Meta Velox unified execution engine Presto Spark",
-        tag: "Query Engine",
-        summary: "Meta's open-source C++ database acceleration library unifying Presto and Spark workloads."
+        title: "LangChain LCEL & Runnables",
+        query: "LangChain LCEL RunnablePassthrough pipe composition patterns",
+        tag: "Core Framework",
+        summary: "Declarative composition, streaming, and fallback routing for production LLM pipelines."
       },
       {
-        title: "Meta Iceberg & Data Lakehouse",
-        query: "Meta data lakehouse Apache Iceberg adoption",
-        tag: "Storage & Lake",
-        summary: "Migration from legacy Hive metastore partitions to Apache Iceberg metadata tables at exabyte scale."
+        title: "LangGraph State Machines",
+        query: "LangGraph state machine multi-agent workflow human in the loop",
+        tag: "Agentic Systems",
+        summary: "Stateful cyclic graph orchestration, multi-agent coordination, and checkpoint persistence."
       },
       {
-        title: "Real-Time Flink Streaming for Reels",
-        query: "Meta Apache Flink stream processing Instagram Reels",
-        tag: "Streaming",
-        summary: "Stateful stream processing pipelines for real-time video engagement ranking and telemetry."
+        title: "Hybrid Search & Cross-Encoder Rerank",
+        query: "Production RAG hybrid search BM25 dense cross-encoder reranking",
+        tag: "Advanced RAG",
+        summary: "Combining sparse BM25 and dense embeddings with Reciprocal Rank Fusion."
       },
       {
-        title: "FAISS Vector Search & DLRM",
-        query: "Meta FAISS vector similarity search recommendation systems",
-        tag: "AI Infrastructure",
-        summary: "Billion-scale embedding retrieval for content recommendation and ad click-through prediction."
+        title: "Vector DB Scaling Trade-offs",
+        query: "Vector database scaling trade-offs Pinecone vs Qdrant vs Chroma vs Milvus",
+        tag: "Vector Stores",
+        summary: "Detailed memory, latency, and index algorithm comparisons across 6 vector databases."
       },
       {
-        title: "Scuba & Gorilla Time Series",
-        query: "Meta Scuba real-time analytics Gorilla in-memory time series",
-        tag: "Telemetry",
-        summary: "Sub-second analytical queries on real-time log telemetry across Meta data centers."
+        title: "Token Economics & Semantic Caching",
+        query: "LLM prompt caching semantic cache Redis token cost reduction",
+        tag: "Cost Optimization",
+        summary: "Reducing inference costs by up to 70% using semantic caching and prompt prefix caching."
       },
       {
-        title: "Data Quality & Circuit Breakers",
-        query: "Meta data quality monitoring pipelines anomaly detection",
-        tag: "Reliability",
-        summary: "Automated partition halting and SLA anomaly alerting to prevent corrupt data propagation."
+        title: "Ragas Production Evaluation",
+        query: "RAG evaluation Ragas framework faithfulness context precision",
+        tag: "Observability & Eval",
+        summary: "Automated verification of context precision, faithfulness, and answer relevance."
       }
     ]
   });

@@ -1,18 +1,19 @@
-/* Meta Theme Styling - Technical Dashboard / Data Grid */
+/* LangChain & AI Systems Architecture Theme Styling */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --bg-primary: #0F172A;
-  --bg-card: #1E293B;
-  --bg-card-hover: #243247;
-  --border-color: #334155;
+  --bg-primary: #0B0F19;
+  --bg-card: #161F30;
+  --bg-card-hover: #1E2B42;
+  --border-color: #2D3A4F;
   --border-subtle: #1E293B;
   --text-primary: #F8FAFC;
   --text-secondary: #94A3B8;
   --text-muted: #64748B;
-  --meta-blue: #0666FE;
-  --meta-blue-hover: #0555d4;
-  --meta-blue-glow: rgba(6, 102, 254, 0.25);
+  --ai-blue: #3B82F6;
+  --ai-blue-hover: #2563EB;
+  --ai-blue-glow: rgba(59, 130, 246, 0.25);
+  --ai-purple: #8B5CF6;
   --success: #10B981;
   --warning: #F59E0B;
   --error: #EF4444;
@@ -196,7 +197,7 @@ code {
 
 /* Button Styling */
 .stButton > button {
-  background: var(--meta-blue) !important;
+  background: var(--ai-blue) !important;
   color: #FFFFFF !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   font-size: 11px !important;
@@ -210,8 +211,8 @@ code {
 }
 
 .stButton > button:hover {
-  background: var(--meta-blue-hover) !important;
-  box-shadow: 0 0 12px var(--meta-blue-glow) !important;
+  background: var(--ai-blue-hover) !important;
+  box-shadow: 0 0 12px var(--ai-blue-glow) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -236,8 +237,8 @@ textarea {
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: var(--meta-blue) !important;
-  box-shadow: 0 0 0 1px var(--meta-blue) !important;
+  border-color: var(--ai-blue) !important;
+  box-shadow: 0 0 0 1px var(--ai-blue) !important;
 }
 
 /* Dropdown & Multiselect Pills */
@@ -259,7 +260,7 @@ span[data-baseweb="tag"] {
 [data-testid="stAlert"] {
   background-color: var(--bg-card) !important;
   border: 1px solid var(--border-color) !important;
-  border-left: 4px solid var(--meta-blue) !important;
+  border-left: 4px solid var(--ai-blue) !important;
   border-radius: 6px !important;
   color: var(--text-primary) !important;
   padding: 0.85rem 1rem !important;
@@ -282,7 +283,7 @@ span[data-baseweb="tag"] {
 
 /* Progress bar */
 .stProgress > div > div > div > div {
-  background-color: var(--meta-blue) !important;
+  background-color: var(--ai-blue) !important;
 }
 
 .stProgress > div > div {
@@ -316,7 +317,7 @@ footer {
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: var(--meta-blue);
+  background-color: var(--ai-blue);
   color: #FFFFFF;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
@@ -331,7 +332,7 @@ footer {
 }
 
 #search-sidebar-toggle:hover {
-  background-color: var(--meta-blue-hover);
+  background-color: var(--ai-blue-hover);
   box-shadow: 0 0 16px rgba(6, 102, 254, 0.5);
   transform: translateY(-1px);
 }
@@ -422,12 +423,12 @@ footer {
 }
 
 .search-drawer-input:focus {
-  border-color: var(--meta-blue) !important;
-  box-shadow: 0 0 0 1px var(--meta-blue) !important;
+  border-color: var(--ai-blue) !important;
+  box-shadow: 0 0 0 1px var(--ai-blue) !important;
 }
 
 .search-drawer-btn {
-  background-color: var(--meta-blue) !important;
+  background-color: var(--ai-blue) !important;
   color: #FFFFFF !important;
   border: none !important;
   border-radius: 6px !important;
@@ -441,7 +442,7 @@ footer {
 }
 
 .search-drawer-btn:hover {
-  background-color: var(--meta-blue-hover) !important;
+  background-color: var(--ai-blue-hover) !important;
 }
 
 .chip-btn {
@@ -458,7 +459,7 @@ footer {
 
 .chip-btn:hover {
   background: rgba(6, 102, 254, 0.15);
-  border-color: var(--meta-blue);
+  border-color: var(--ai-blue);
   color: #93C5FD;
 }
 
@@ -481,7 +482,7 @@ footer {
   width: 28px;
   height: 28px;
   border: 3px solid rgba(6, 102, 254, 0.2);
-  border-top-color: var(--meta-blue);
+  border-top-color: var(--ai-blue);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto;
@@ -512,7 +513,7 @@ footer {
 
 .grounded-source-chip:hover {
   background: rgba(6, 102, 254, 0.2);
-  border-color: var(--meta-blue);
+  border-color: var(--ai-blue);
   color: #FFFFFF;
 }
 

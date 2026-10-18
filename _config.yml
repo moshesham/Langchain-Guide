@@ -1,5 +1,5 @@
-title: Meta Data Engineer Prep Blueprint
-description: Interactive Technical & Case Study Guide
+title: LangChain & AI Systems Engineering Guide
+description: Interactive Technical & Architectural Guide for AI Engineers
 theme: jekyll-theme-primer
 include:
   - app.py

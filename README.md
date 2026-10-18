@@ -1,15 +1,15 @@
-# Meta Data Engineer Candidate Study Guide & Interview Blueprint
+# LangChain & Production AI Systems Engineering Blueprint
 
-An interactive web application built with Python and Streamlit, rendered client-side on GitHub Pages via **stlite** (WebAssembly), and wrapped in Jekyll format. This application features a robust CI/CD pipeline using GitHub Actions.
+An interactive, production-grade web application built for AI Engineers to master **LangChain**, **RAG Pipelines**, **Vector Database Trade-offs**, **Agentic Workflows (LangGraph)**, and **LLM Scaling Economics**.
 
-## Setup Instructions
+Rendered client-side via **stlite** (WebAssembly Pyodide runtime) and paired with an Express full-stack proxy supporting real-time Google Search grounded research.
 
-1. **Initialize Git Repository:**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: Meta DE Prep App"
-   ```
+## Features
+- **Interactive Mermaid.js RAG Sequence Diagram:** Visualizing query expansion, dense embedding, vector retrieval, cross-encoder reranking, and structured output parsing with interactive node inspection.
+- **Scaling Cost & Token Calculator:** Real-time token consumption simulation and LLM pricing comparison across query volumes with semantic caching economics.
+- **Vector Database Configurator:** Multi-dimensional trade-off matrix and memory footprint analysis comparing Pinecone, FAISS, Chroma, Qdrant, Milvus, and pgvector.
+- **LangChain LCEL Deep Dive:** Composition patterns, streaming, fallback runnables, and production state machines.
+- **AI Architecture Radar:** Real-time search-grounded research on LLM engineering and distributed AI systems.
 
 2. **Push to GitHub:**
    ```bash

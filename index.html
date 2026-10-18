@@ -3,32 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meta Data Engineer Prep Blueprint</title>
-  <meta name="description" content="Interactive Technical & Case Study Guide for Meta Data Engineer Candidates" />
-  <meta property="og:title" content="Meta Data Engineer Prep Blueprint" />
-  <meta property="og:description" content="Interactive Technical & Case Study Guide for Meta Data Engineer Candidates" />
+  <title>LangChain & AI Systems Engineering Mastery</title>
+  <meta name="description" content="Interactive Technical & Architectural Guide for AI Engineers to master LangChain, RAG Pipelines, Vector Databases, and Scalable Agentic Systems in Production" />
+  <meta property="og:title" content="LangChain & AI Systems Engineering Mastery" />
+  <meta property="og:description" content="Interactive Technical & Architectural Guide for AI Engineers to master LangChain, RAG Pipelines, Vector Databases, and Scalable Agentic Systems in Production" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.0/build/stlite.css" />
   <link rel="stylesheet" href="assets/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 </head>
 <body>
   <div id="root">
-    <div id="loading-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #0F172A; color: #F8FAFC; font-family: 'Inter', system-ui, sans-serif;">
+    <div id="loading-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #0B0F19; color: #F8FAFC; font-family: 'Inter', system-ui, sans-serif;">
       <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-        <div style="width: 36px; height: 36px; background: #0666FE; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: white; box-shadow: 0 0 20px rgba(6, 102, 254, 0.4);">M</div>
-        <div style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase;">Meta DE Blueprint</div>
+        <div style="width: 38px; height: 38px; background: linear-gradient(135deg, #2563EB, #7C3AED); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: white; box-shadow: 0 0 25px rgba(37, 99, 235, 0.45);">🦜</div>
+        <div>
+          <div style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #FFFFFF;">LangChain & AI Systems</div>
+          <div style="font-size: 11px; color: #94A3B8; font-weight: 500;">Production Architecture & Engineering Blueprint</div>
+        </div>
       </div>
       <div style="width: 280px; height: 4px; background: #1E293B; border-radius: 9999px; overflow: hidden; margin-bottom: 14px;">
-        <div style="width: 45%; height: 100%; background: #0666FE; border-radius: 9999px; animation: loadingPulse 1.8s infinite ease-in-out;"></div>
+        <div style="width: 45%; height: 100%; background: linear-gradient(90deg, #2563EB, #8B5CF6); border-radius: 9999px; animation: loadingPulse 1.8s infinite ease-in-out;"></div>
       </div>
       <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94A3B8; font-weight: 600;">
-        Mounting Pyodide & DE Simulation Sandbox...
+        Mounting Pyodide & AI Engineering Runtime...
       </div>
       <div style="font-size: 11px; color: #64748B; margin-top: 6px; font-family: 'JetBrains Mono', monospace;">
-        Loading pandas, numpy, plotly & graphviz
+        Initializing LangChain simulation engine, Plotly, Pandas & Vector Models
       </div>
     </div>
   </div>
@@ -49,15 +53,15 @@
       .then((appCode) => {
         stlite.mount(
           {
-            requirements: ["plotly", "pandas", "numpy", "graphviz"],
+            requirements: ["plotly", "pandas", "numpy"],
             entrypoint: "app.py",
             files: {
               "app.py": appCode
             },
             streamlitConfig: {
-              "theme.primaryColor": "#0666FE",
-              "theme.backgroundColor": "#0F172A",
-              "theme.secondaryBackgroundColor": "#1E293B",
+              "theme.primaryColor": "#3B82F6",
+              "theme.backgroundColor": "#0B0F19",
+              "theme.secondaryBackgroundColor": "#161F30",
               "theme.textColor": "#F8FAFC"
             }
           },
@@ -69,10 +73,10 @@
         const container = document.getElementById("loading-container");
         if (container) {
           container.innerHTML = `
-            <div style="background: #1E293B; border: 1px solid #EF4444; border-radius: 8px; padding: 24px; max-width: 450px; text-align: center;">
+            <div style="background: #161F30; border: 1px solid #EF4444; border-radius: 8px; padding: 24px; max-width: 450px; text-align: center;">
               <div style="color: #EF4444; font-weight: 700; margin-bottom: 8px;">Initialization Failed</div>
               <div style="font-size: 12px; color: #94A3B8; margin-bottom: 16px;">${err.message || 'Error mounting runtime'}</div>
-              <button onclick="window.location.reload()" style="background: #0666FE; color: white; border: none; border-radius: 4px; padding: 8px 16px; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase;">Retry</button>
+              <button onclick="window.location.reload()" style="background: #2563EB; color: white; border: none; border-radius: 4px; padding: 8px 16px; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase;">Retry</button>
             </div>
           `;
         }
@@ -82,27 +86,27 @@
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
 
   <!-- Grounded Search Sidebar Toggle Button -->
-  <button id="search-sidebar-toggle" onclick="toggleSearchSidebar()" title="Open Meta DE Research Radar">
+  <button id="search-sidebar-toggle" onclick="toggleSearchSidebar()" title="Open AI Systems Research Radar">
     <span class="material-symbols-outlined" style="font-size: 16px;">travel_explore</span>
-    <span>Meta Tech Radar</span>
+    <span>AI Tech Radar</span>
   </button>
 
   <!-- Grounded Search Sidebar Drawer & Backdrop -->
   <div id="search-drawer-backdrop" class="search-drawer-backdrop" onclick="toggleSearchSidebar()"></div>
-  <aside id="search-sidebar-drawer" class="search-sidebar-drawer" aria-label="Meta DE Semantic Research Sidebar">
+  <aside id="search-sidebar-drawer" class="search-sidebar-drawer" aria-label="LangChain & AI Systems Research Sidebar">
     <div class="search-drawer-header">
       <div style="display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <div style="width: 24px; height: 24px; background: #0666FE; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: white;">M</div>
+          <div style="width: 26px; height: 26px; background: linear-gradient(135deg, #2563EB, #7C3AED); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white;">🦜</div>
           <div>
-            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: #FFFFFF; text-transform: uppercase;">Meta DE Research Radar</div>
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: #FFFFFF; text-transform: uppercase;">AI Systems Research Radar</div>
             <div style="font-size: 10px; color: #10B981; font-family: monospace;">● Google Search Grounded</div>
           </div>
         </div>
         <button class="search-drawer-close" onclick="toggleSearchSidebar()" aria-label="Close sidebar">✕</button>
       </div>
       <div style="font-size: 11px; color: #94A3B8; margin-top: 8px; line-height: 1.4;">
-        Real-time search across <span style="color: #60A5FA; font-family: monospace;">engineering.fb.com</span> and modern data engineering architectural breakthroughs.
+        Real-time search across official LangChain docs, vector store architectures, and production LLM scaling papers.
       </div>
     </div>
 
@@ -113,7 +117,7 @@
           <input 
             id="search-input" 
             type="text" 
-            placeholder="e.g. Velox execution engine, Iceberg lakehouse, Flink Reels..." 
+            placeholder="e.g. LangGraph StateGraph, Pinecone vs Qdrant, RAG reranking..." 
             autocomplete="off"
             class="search-drawer-input"
             required
@@ -124,18 +128,18 @@
         </div>
       </form>
       
-      <!-- Trending Meta Architecture Chips -->
+      <!-- Trending AI Systems Architecture Chips -->
       <div style="margin-top: 10px;">
         <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748B; margin-bottom: 6px;">
-          High-Frequency Meta Interview Topics:
+          High-Frequency AI Engineering Topics:
         </div>
         <div id="trending-chips-container" style="display: flex; flex-wrap: wrap; gap: 5px;">
-          <button type="button" class="chip-btn" onclick="quickSearch('Meta Velox unified execution engine Presto Spark')">⚡ Velox Engine</button>
-          <button type="button" class="chip-btn" onclick="quickSearch('Meta Apache Iceberg lakehouse migration')">🧊 Iceberg Lakehouse</button>
-          <button type="button" class="chip-btn" onclick="quickSearch('Meta Apache Flink stream processing Instagram Reels')">🌊 Flink Streaming</button>
-          <button type="button" class="chip-btn" onclick="quickSearch('Meta FAISS vector similarity search recommendation')">🤖 FAISS Vector</button>
-          <button type="button" class="chip-btn" onclick="quickSearch('Meta Scuba real-time analytics Gorilla in-memory')">📊 Scuba & Gorilla</button>
-          <button type="button" class="chip-btn" onclick="quickSearch('Meta data quality monitoring pipeline anomaly detection')">🛡️ Data Quality</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('LangChain LCEL RunnablePassthrough pipe composition patterns')">🦜 LCEL Runnables</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('LangGraph state machine multi-agent workflow human in the loop')">⚡ LangGraph State</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('Production RAG hybrid search BM25 dense cross-encoder reranking')">🔍 Hybrid RAG & Rerank</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('Vector database scaling trade-offs Pinecone vs Qdrant vs Chroma vs Milvus')">📦 Vector DB Trade-offs</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('LLM prompt caching semantic cache Redis token cost reduction')">💰 Token Caching & Cost</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('RAG evaluation Ragas framework faithfulness context precision')">🛡️ Ragas Evaluation</button>
         </div>
       </div>
     </div>
@@ -146,14 +150,14 @@
         <span class="material-symbols-outlined" style="font-size: 38px; color: #334155; margin-bottom: 10px;">query_stats</span>
         <div style="font-weight: 600; font-size: 13px; color: #E2E8F0; margin-bottom: 4px;">Semantic Knowledge Grounding</div>
         <div style="font-size: 11.5px; color: #94A3B8; max-width: 320px; line-height: 1.5;">
-          Search any Meta engineering system, distributed data concept, or L4/L5 interview topic. Grounded directly with Google Search.
+          Search any LangChain module, LCEL runnable, vector store architecture, or production LLM scaling pattern. Grounded directly with Google Search.
         </div>
       </div>
       
       <div id="search-loading" style="display: none; padding: 36px 16px; text-align: center;">
         <div class="search-spinner"></div>
         <div style="font-size: 12px; font-weight: 600; color: #F8FAFC; margin-top: 14px;">Querying Google Search Grounding...</div>
-        <div style="font-size: 11px; color: #64748B; margin-top: 4px;">Retrieving Meta Engineering Blog posts & verifying sources</div>
+        <div style="font-size: 11px; color: #64748B; margin-top: 4px;">Retrieving AI systems documentation, benchmarks & verifying sources</div>
       </div>
 
       <div id="search-error" style="display: none; padding: 16px; background: rgba(239, 68, 68, 0.1); border: 1px solid #EF4444; border-radius: 6px; margin-bottom: 12px;">
